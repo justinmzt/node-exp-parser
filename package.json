@@ -1,0 +1,14 @@
+{
+  "name": "node-exp-parser",
+  "version": "1.0.10",
+  "description": "node-exp-parser",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "node test"
+  },
+  "author": "justinmzt",
+  "license": "ISC"
+}
