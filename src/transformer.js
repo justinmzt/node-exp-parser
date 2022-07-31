@@ -1,4 +1,6 @@
-const { EvalToMongo, Preprocess } = require('./parser');
+const { Parser } = require('./parser');
+const { Preprocess } = require('./preprocess');
+const MongoDBPlugin = require('./plugins/mongodb');
 
 /**
  * @function Branch To Frontend JSON
@@ -46,9 +48,9 @@ class Transformer {
      * @param expression
      */
     static etot(expression) {
-        const evalToMongo = new EvalToMongo();
         const process = new Preprocess(expression);
-        return evalToMongo.run_binary_Tree(process)
+        const parser = new Parser(process);
+        return parser.parse();
     }
 
     /**
@@ -56,9 +58,8 @@ class Transformer {
      * @param expression
      */
     static etom(expression) {
-        const evalToMongo = new EvalToMongo();
         const process = new Preprocess(expression);
-        return evalToMongo.run(process)
+        return MongoDBPlugin.exec(process)
     }
 
     /**
