@@ -78,16 +78,16 @@ const exp = Parser.ttoe({"type":"comparison","content":{"comparator":"=","key":"
 ### 3. 设置 key 映射表以支持表达式包含不同语言的 key
 
 **Parser.setKeymap(list)**
-- list: key 配置数组
-  - key: 原始 key
-  - [language]: 当语言为 `language` 时，表达式中的 key 名
+- `list`: key 配置数组
+  - `key`: 原始 key
+  - `[language]`: 当语言为 `language` 时的 key 值。
 
 ### 4. Expression To MongoDB Query
 
 **Parser.etom(expression, options)**
 - `expression`: The expression string.
 - `options`: Parse Options.
-  - keyLang: this language of key in expression. (Define the keymap)
+  - `keyLang`: 表达式中 key 的语言（对应上述 API 中的 `language`）
 
 ```js
 const Parser = require("node-exp-parser");
