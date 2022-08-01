@@ -1,11 +1,19 @@
-const Parser = require('./src/parser');
+const {
+    Token,
+    Tokenizer,
+    Parser,
+} = require('./src/parser');
 const Transformer = require('./src/transformer');
 
-exports.Token = Parser.Token;
-exports.Tokenizer = Parser.Tokenizer;
-exports.Parser = Parser.Parser;
-exports.EvalToMongo = Parser.EvalToMongo;
-exports.Preprocess = Parser.Preprocess;
+exports.Token = Token;
+exports.Tokenizer = Tokenizer;
+exports.Parser = Parser;
+
+/**
+ * @function 设置解析器的 Key 映射表，将表达式中不同语言的 key 转换为指定 key。
+ * @param list
+ */
+exports.setKeymap = Parser.setKeymap;
 
 /**
  * @function 表达式转语法树 Expression To Syntax Tree

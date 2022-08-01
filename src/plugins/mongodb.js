@@ -84,47 +84,6 @@ function isArray(a) {
     return (a instanceof Array)
 }
 
-function evaluate(node, not = false) {
-    if (node.hasOwnProperty('expression')) {
-        var exp = evaluate(node.expression, not);
-        return exp
-    }
-
-    if (node.type === 'binary' && !not) {
-        node = node.content;
-        var left = evaluate(node.left, not);
-        var right = evaluate(node.right, not);
-        if (node.operator === 'or') {
-            return [].concat(left, right);
-        }
-        if (node.operator === 'and') {
-            var and = extend(left, right);
-            return and;
-        }
-    }
-    if (node.type === 'unary') {
-        node = node.content;
-        if (node.operator === '!' || node.operator === 'not') {
-            var expression = evaluate(node.expression, not);
-            let nor = { $nor: [expression] }
-            if (isArray(expression)) {
-                nor = {
-                    $nor: [{
-                        $or: expression
-                    }]
-                }
-
-            }
-            return nor;
-
-
-        }
-    }
-    if (node.type === 'comparison') {
-        return genComparison(node.content, not);
-    }
-    return {}
-}
 
 function extend(o1, o2) {
     var ret = {};
@@ -164,23 +123,6 @@ function extend(o1, o2) {
         }
     }
     return ret;
-}
-
-// might be better to do Type detection when tokenizing..
-function handleValue(value) {
-    if (value instanceof Array) {
-        return value.map(item => {
-            return handleValue(item)
-        })
-    }
-    if (value.match(/^[-]{0,1}\d*$/)) {
-        return parseInt(value);
-    }
-    return value
-        .replace(/"/g, '')
-        .replace(/\\([*$])/g, ($, $1) => {
-            return $1
-        });
 }
 
 // 解析日期字符串
@@ -228,29 +170,97 @@ function _parseDateQuery(value) {
     }
 }
 
-function genComparison(node, not) {
-    /* {
-      "comparator": ":",
-      "key": "C",
-      "value": "D"
-    }*/
-    var comparator = node.comparator;
-    var key = node.key;
-    var value = node.value ? handleValue(node.value) : '';
-    var result = {};
 
-    if (comparatorController[comparator]) {
-        comparatorController[comparator](result, key, value, not)
+class MongoDBParser {
+    constructor(option) {
+        this.option = Object.assign({
+            keyLang: 'default'
+        }, option);
+        this.map = Parser.config.keymap[this.option.keyLang] || {};
     }
 
-    return result;
+    evaluate(node, not = false) {
+        if (node.hasOwnProperty('expression')) {
+            var exp = this.evaluate(node.expression, not);
+            return exp
+        }
+
+        if (node.type === 'binary' && !not) {
+            node = node.content;
+            var left = this.evaluate(node.left, not);
+            var right = this.evaluate(node.right, not);
+            if (node.operator === 'or') {
+                return [].concat(left, right);
+            }
+            if (node.operator === 'and') {
+                var and = extend(left, right);
+                return and;
+            }
+        }
+        if (node.type === 'unary') {
+            node = node.content;
+            if (node.operator === '!' || node.operator === 'not') {
+                var expression = this.evaluate(node.expression, not);
+                let nor = { $nor: [expression] };
+                if (isArray(expression)) {
+                    nor = {
+                        $nor: [{
+                            $or: expression
+                        }]
+                    }
+
+                }
+                return nor;
+            }
+        }
+        if (node.type === 'comparison') {
+            return this._genComparison(node.content, not);
+        }
+        return {}
+    }
+
+    _genComparison(node, not) {
+        /* {
+          "comparator": ":",
+          "key": "C",
+          "value": "D"
+        }*/
+        var comparator = node.comparator;
+        var key = this.map[node.key] || node.key;
+        var value = node.value ? this._handleValue(node.value) : '';
+        var result = {};
+
+        if (comparatorController[comparator]) {
+            comparatorController[comparator](result, key, value, not)
+        }
+
+        return result;
+    }
+
+    // might be better to do Type detection when tokenizing..
+    _handleValue(value) {
+        if (value instanceof Array) {
+            return value.map(item => {
+                return this._handleValue(item)
+            })
+        }
+        if (value.match(/^[-]{0,1}\d*$/)) {
+            return parseInt(value);
+        }
+        return value
+            .replace(/"/g, '')
+            .replace(/\\([*$])/g, ($, $1) => {
+                return $1
+            });
+    }
+
 }
 
-
-function exec(process) {
+function exec(process, option) {
     const parser = new Parser(process);
     const exp = parser.parse();
-    const query = evaluate(exp);
+    const dbParser = new MongoDBParser(option);
+    const query = dbParser.evaluate(exp);
     if (query instanceof Array) {
         return {
             $or: query

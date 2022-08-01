@@ -1,31 +1,33 @@
-var data = require('./data')
-var Parser = require('../index');
+const data = require('./data');
+const Parser = require('../index');
 
-const test = () => {
+const test = (list, option) => {
     const errExps = [];
-    for (let i = 0; i < data.exp.length; i++) {
+    for (let i = 0; i < list.length; i++) {
         const self = {};
-        if (data.exp[i] instanceof Array) {
-            self.exp = data.exp[i][0];
-            self.expectValue = data.exp[i][1];
-            self.mongoQuery = data.exp[i][2];
+        if (list[i] instanceof Array) {
+            self.exp = list[i][0];
+            self.expectValue = list[i][1];
+            self.mongoQuery = list[i][2];
         }
         else {
-            self.exp = data.exp[i]
+            self.exp = list[i]
         }
+
+        const mongoDBOpts = Object.assign({}, option);
         // console.log(self.exp, '***********Expression');
         // console.log(JSON.stringify(Parser.etot(self.exp)), "***********Syntax Tree");
-        // console.log(JSON.stringify(Parser.etom(self.exp)), "***********MongoDB Query");
+        // console.log(JSON.stringify(Parser.etom(self.exp, mongoDBOpts)), "***********MongoDB Query");
         // console.log(JSON.stringify(Parser.ttof(Parser.etot(self.exp))), "***********Frontend UI JSON");
         // console.log(JSON.stringify(Parser.ftot(Parser.ttof(Parser.etot(self.exp)))));
         // console.log('----------------------------------------------');
         const result = Parser.ttoe(Parser.etot(self.exp));
         const UIJSONResult = Parser.ttoe(Parser.ftot(Parser.ttof(Parser.etot(self.exp))));
-        const mongoResult = JSON.stringify(Parser.etom(self.exp));
+        const mongoResult = JSON.stringify(Parser.etom(self.exp, mongoDBOpts));
         if (result !== self.expectValue || UIJSONResult !== self.expectValue || mongoResult !== self.mongoQuery) {
             console.log(self.exp, '***********Expression');
             console.log(JSON.stringify(Parser.etot(self.exp)), "***********Syntax Tree");
-            console.log(JSON.stringify(Parser.etom(self.exp)), "***********MongoDB Query");
+            console.log(JSON.stringify(Parser.etom(self.exp, mongoDBOpts)), "***********MongoDB Query");
             console.log(JSON.stringify(Parser.ttof(Parser.etot(self.exp))), "***********Frontend UI JSON");
             if (result !== self.expectValue) {
                 console.error(result, '***********Result, Transform Error');
@@ -70,6 +72,22 @@ const testErr = () => {
     }
 };
 
-const errExps = test();
-process.exit(errExps.length ? 1 : 0);
+let errExps = test(data.exp);
+if (errExps.length) {
+    return process.exit(1)
+}
+
+// key 映射测试
+const { initKeymap, keymapExp } = require('./keymap');
+initKeymap();
+
+// 设置 key 映射为中文
+errExps = test(keymapExp, {
+    keyLang: 'zh-cn'
+});
+
+if (errExps.length) {
+    return process.exit(1)
+}
+process.exit(0);
 // testErr();

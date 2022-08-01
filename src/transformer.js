@@ -56,10 +56,12 @@ class Transformer {
     /**
      * @function Expression To MongoDB Query
      * @param expression
+     * @param option
+     * @param option.lang: 表达式 key 的语言，对应 keymap
      */
-    static etom(expression) {
+    static etom(expression, option = {}) {
         const process = new Preprocess(expression);
-        return MongoDBPlugin.exec(process)
+        return MongoDBPlugin.exec(process, option)
     }
 
     /**

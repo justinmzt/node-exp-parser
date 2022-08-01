@@ -38,7 +38,7 @@ console.log(JSON.stringify(Parser.etom('a:[1,2,"[3]"]')));
 Add a file **exp.js** with the following content:
 
 ```js
-var Parser = require("node-exp-parser");
+const Parser = require("node-exp-parser");
 console.log(JSON.stringify(Parser.etot('a:[1,2,"[3]"]')));
 // {"type":"comparison","content":{"comparator":"in","key":"a","value":["1","2","[3]"]}}
 console.log(JSON.stringify(Parser.etom('a:[1,2,"[3]"]')));
@@ -62,7 +62,7 @@ ES6
 **Parser.etot(expression)**
 
 ```js
-var tree = Parser.etot('a: 1 and b: 2')
+const tree = Parser.etot('a: 1 and b: 2')
 // "{"type":"binary","content":{"operator":"and","left":{"type":"comparison","content":{"comparator":"=","key":"a","value":"1"}},"right":{"type":"comparison","content":{"comparator":"=","key":"b","value":"2"}}}}"
 ```
 
@@ -71,34 +71,55 @@ var tree = Parser.etot('a: 1 and b: 2')
 **Parser.ttoe(tree)**
 
 ```js
-var exp = Parser.ttoe({"type":"comparison","content":{"comparator":"=","key":"a","value":"1"}})
+const exp = Parser.ttoe({"type":"comparison","content":{"comparator":"=","key":"a","value":"1"}})
 // "a: 1"
 ```
 
-### 3. Expression To MongoDB Query
+### 3. 设置 key 映射表以支持表达式包含不同语言的 key
 
-**Parser.etom(expression)**
+**Parser.setKeymap(list)**
+- list: key 配置数组
+  - key: 原始 key
+  - [language]: 当语言为 `language` 时，表达式中的 key 名
+
+### 4. Expression To MongoDB Query
+
+**Parser.etom(expression, options)**
+- `expression`: The expression string.
+- `options`: Parse Options.
+  - keyLang: this language of key in expression. (Define the keymap)
 
 ```js
-var query = Parser.etom('a: 1 and b: 2')
+const Parser = require("node-exp-parser");
+
+const query = Parser.etom('a: 1 and b: 2')
 // "{"a":1,"b":2}"
+
+const query2 = Parser.etom('测试: 1 and 测试.级联: 2')
+// "{"测试":1,"测试.级联":2}"
+Parser.setKeymap([
+    { key: 'test', ['zh-cn']: '测试' },
+    { key: 'test2', ['zh-cn']: '测试.级联' },
+]);
+const query3 = Parser.etom('测试: 1 and 测试.级联: 2', { keyLang: 'zh-cn' });
+// "{"test":1,"test2":2}"
 ```
 
-### 4. Syntax Tree To UI JSON
+### 5. Syntax Tree To UI JSON
 
 **Parser.ttof(tree)**
 
 ```js
-var json = Parser.ttof({"type":"comparison","content":{"comparator":"=","key":"a","value":"1"}})
+const json = Parser.ttof({"type":"comparison","content":{"comparator":"=","key":"a","value":"1"}})
 // "{"afterOperator":"and","children":[{"comparator":"=","key":"a","value":"1","afterOperator":"and"}]}"
 ```
 
-### 5. UI JSON To Syntax Tree
+### 6. UI JSON To Syntax Tree
 
 **Parser.ftot(json)**
 
 ```js
-var tree = Parser.ftot({"afterOperator":"and","children":[{"comparator":"=","key":"a","value":"1","afterOperator":"and"}]})
+const tree = Parser.ftot({"afterOperator":"and","children":[{"comparator":"=","key":"a","value":"1","afterOperator":"and"}]})
 // "{"type":"comparison","content":{"comparator":"=","key":"a","value":"1","afterOperator":"and"}}"
 ```
 

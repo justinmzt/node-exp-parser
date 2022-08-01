@@ -48,7 +48,7 @@ function Tokenizer(expression) {
         'comparator': /^ *(?:\:|>=|<=|>|<) */, // in['a','b'] -> $in:['a','b'];  >= ; <=
         'operator': /^(not) ?|^(and) ?|^(or) ?|^(&&) ?|^(\|\|) ?|^(\() ?|^(\)) ?|^(!) ?/, //|^(!) ?
         //'string': /^ *(([a-zA-Z0-9-_\.\*%:\\\/\.]{1,})|([\'\"][a-zA-Z0-9-_\.\*%:\(\)\\\/\. ]{1,}[\'\"])) */
-        'string': /^ *(([a-zA-Z0-9-_\.\*%\\\/\.\$]+)|(\'[a-zA-Z0-9-_\.\*%\(\)\\\/\.\$ ]+\')|(\"[a-zA-Z0-9-_\.\*%\(\)\\\/\.\$ ]+\")) */
+        'string': /^ *(([\u2E80-\uFFFDa-zA-Z0-9-_\.\*%\\\/\.\$]+)|(\'[\u2E80-\uFFFDa-zA-Z0-9-_\.\*%\(\)\\\/\.\$ ]+\')|(\"[\u2E80-\uFFFDa-zA-Z0-9-_\.\*%\(\)\\\/\.\$ ]+\")) */
     };
     this.tokens = [];
 
@@ -100,48 +100,71 @@ function Tokenizer(expression) {
     }
 }
 
-function Parser(process) {
-    this.process = process;
-    const expression = process.exp;
-    this.expression = expression;
-    var that = this;
-    that.tokenizer = (expression) ? new Tokenizer(expression) : new Tokenizer('');
+class Parser {
+    static config = {
+        keymap: {}
+    };
 
-    // if (expression) that.tokenizer = new Tokenizer(expression);
+    static setKeymap(list) {
+        if (!list instanceof Array){
+            return
+        }
+        Parser.config.keymap = {};
+        const keymap = Parser.config.keymap;
+        list.forEach(item => {
+            if (!item.key) {
+                return
+            }
+            for (let lang of Object.keys(item)) {
+                if (lang !== 'key') {
+                    if (!keymap[lang]) {
+                        keymap[lang] = {}
+                    }
+                    keymap[lang][item[lang]] = item.key
+                }
+            }
+        });
+    }
+
+    constructor(process) {
+        this.process = process;
+        this.expression = process.exp;
+        this.tokenizer = this.expression ? new Tokenizer(this.expression) : new Tokenizer('');
+    }
+
     // Condition ::= Key '=' Value |
     // 		  		 Key '>' Value |
     //		 		 Key '<' Value |
     //				 Key
-
-    function parseCondition() {
-        var keyToken = that.tokenizer.next();
+    _parseCondition() {
+        var keyToken = this.tokenizer.next();
         if (!keyToken.isKey() && !keyToken.isValue()) {
-            throw new Expecting('KEY', that.tokenizer.last());
+            throw new Expecting('KEY', this.tokenizer.last());
         }
-        var compToken = that.tokenizer.peek();
+        var compToken = this.tokenizer.peek();
         if (compToken && compToken.isComparator()) {
-            compToken = that.tokenizer.next();
+            compToken = this.tokenizer.next();
         }
         else {
             return {
                 comparator: 'exists',
-                key: process.restore(keyToken.value),
+                key: this.process.restore(keyToken.value),
             }
         }
         if (!compToken || !compToken.isComparator()) {
-            throw new Expecting('COMPARATOR', that.tokenizer.last());
+            throw new Expecting('COMPARATOR', this.tokenizer.last());
         }
 
-        var valueToken = that.tokenizer.next();
+        var valueToken = this.tokenizer.next();
         if (!valueToken.isValue()) {
-            throw new Expecting('VALUE', that.tokenizer.last());
+            throw new Expecting('VALUE', this.tokenizer.last());
         }
 
-        const restoredValue = process.restore(valueToken.value);
-        const comparator = process.getComparator(valueToken.value, restoredValue, compToken.value);
+        const restoredValue = this.process.restore(valueToken.value);
+        const comparator = this.process.getComparator(valueToken.value, restoredValue, compToken.value);
         return {
             comparator: comparator,
-            key: process.restore(keyToken.value),
+            key: this.process.restore(keyToken.value),
             value: restoredValue,
         }
 
@@ -149,21 +172,19 @@ function Parser(process) {
 
     // Primary ::= Condition |
     //			   '('OrExpression')'
-
-    function parsePrimary() {
-        var exp;
-        var token = that.tokenizer.peek();
+    _parsePrimary() {
+        var token = this.tokenizer.peek();
         if (token.isKey() || token.isValue()) {
-            var condition = parseCondition();
+            var condition = this._parseCondition();
             return {
                 type: "comparison",
                 content: condition
             }
         }
         if (token.isOperator() && token.value === '(') {
-            that.tokenizer.next();
-            var exp = parseExpression();
-            token = that.tokenizer.next();
+            this.tokenizer.next();
+            var exp = this._parseExpression();
+            token = this.tokenizer.next();
             if (token.isOperator() && token.value === ')') {
                 return exp
             } else {
@@ -174,13 +195,12 @@ function Parser(process) {
 
     // Unary ::= Primary |
     //		 	 '!'Unary
-
-    function parseUnary() {
+    _parseUnary() {
         var exp;
-        var token = that.tokenizer.peek();
+        var token = this.tokenizer.peek();
         if (token.isNot()) {
-            token = that.tokenizer.next();
-            exp = parseUnary();
+            token = this.tokenizer.next();
+            exp = this._parseUnary();
 
             return {
                 type: "unary",
@@ -190,22 +210,21 @@ function Parser(process) {
                 }
             }
         }
-        return parsePrimary();
+        return this._parsePrimary();
     }
 
     // AndExpression ::= Unary |
     //					 AndExpression 'and' unary|
-
-    function parseAndExp(left) {
+    _parseAndExp(left) {
         var token, right;
-        token = that.tokenizer.peek();
+        token = this.tokenizer.peek();
         if (token.isOr() || token.isAnd()) {
-            token = that.tokenizer.next();
-            right = parseUnary();
+            token = this.tokenizer.next();
+            right = this._parseUnary();
             if (!right) {
                 throw new Expecting('EXPRESSION', token);
             }
-            return parseAndExp({
+            return this._parseAndExp({
                 type: "binary",
                 content: {
                     operator: token.value,
@@ -222,22 +241,22 @@ function Parser(process) {
     }
 
     // Expression ::= OrExpression
-    function parseExpression() {
-        var left = parseUnary();
-        var exp = parseAndExp(left);
-        if (!exp) throw new Expecting('EXPRESSION', that.tokenizer.last());
+    _parseExpression() {
+        var left = this._parseUnary();
+        var exp = this._parseAndExp(left);
+        if (!exp) throw new Expecting('EXPRESSION', this.tokenizer.last());
 
         return exp
     }
 
-    this.parse = function (expression) {
+    parse(expression) {
         if (expression) {
-            that.tokenizer = new Tokenizer(expression);
+            this.tokenizer = new Tokenizer(expression);
         }
         if (!this.expression) {
             return {}
         }
-        return parseExpression()
+        return this._parseExpression()
     }
 }
 
