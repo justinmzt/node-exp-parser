@@ -84,7 +84,7 @@ const exp = Parser.ttoe({"type":"comparison","content":{"comparator":"=","key":"
 
 ### 4. Expression To MongoDB Query
 
-**Parser.etom(expression, options)**
+**Parser.etom(expression, options?)**
 - `expression`: The expression string.
 - `options`: Parse Options.
   - `keyLang`: 表达式中 key 的语言（对应上述 API 中的 `language`）
@@ -121,6 +121,20 @@ const json = Parser.ttof({"type":"comparison","content":{"comparator":"=","key":
 ```js
 const tree = Parser.ftot({"afterOperator":"and","children":[{"comparator":"=","key":"a","value":"1","afterOperator":"and"}]})
 // "{"type":"comparison","content":{"comparator":"=","key":"a","value":"1","afterOperator":"and"}}"
+
+### 7. Rule Check
+
+**Parser.check(target, expression, options?)**
+- `target`: The target json.
+- `expression`: The expression string.
+- `options`: Parse Options.
+  - `keyLang`: 表达式中 key 的语言（对应上述 API 中的 `language`）
+
+```js
+const result = Parser.check({ a: 1, b: 3, c: 4, d: 5 }, 'a: 1 or b: 2 and (c: 3 or d: 4)');
+// false
+const result = Parser.check({ a: 1, b: 3, c: 4, d: 5 }, 'a: 1 or (b: 2 and (c: 3 or d: 4))');
+// true
 ```
 
 ## Syntax

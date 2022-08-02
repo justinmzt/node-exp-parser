@@ -89,5 +89,16 @@ errExps = test(keymapExp, {
 if (errExps.length) {
     return process.exit(1)
 }
+
+// 规则测试
+const { ruleTest } = require('./rule');
+
+// 设置 key 映射为中文
+errExps = ruleTest();
+
+if (errExps.length) {
+    return process.exit(1)
+}
+
 process.exit(0);
 // testErr();

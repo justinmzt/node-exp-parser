@@ -4,6 +4,7 @@ const {
     Parser,
 } = require('./src/parser');
 const Transformer = require('./src/transformer');
+const Rule = require('./src/plugins/rule');
 
 exports.Token = Token;
 exports.Tokenizer = Tokenizer;
@@ -30,6 +31,8 @@ exports.ttoe = Transformer.ttoe;
 /**
  * @function 表达式转 MongoDB 查询语句 Expression To MongoDB Query
  * @param expression
+ * @param option
+ * @param option.keyLang: 表达式 key 的语言，对应 keymap
  */
 exports.etom = Transformer.etom;
 
@@ -45,3 +48,11 @@ exports.ttof = Transformer.ttof;
  */
 exports.ftot = Transformer.ftot;
 
+/**
+ * @function 检测目标对象是否符合表达式
+ * @param target
+ * @param expression
+ * @param option
+ * @param option.keyLang: 表达式 key 的语言，对应 keymap
+ */
+exports.check = Rule.exec;

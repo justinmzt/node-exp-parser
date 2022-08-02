@@ -6,32 +6,28 @@ const comparatorController = {
     ['=']: (self, key, value) => {
         self[key] = value;
     },
-    ['like']: (self, key, value, not) => {
+    ['like']: (self, key, value) => {
         var regString = value.replace(/\\\*/g, '..').replace(/[^\u4E00-\u9FA5\w\-_*]/g, '.').replace(/(?<!\\)\*/g, '.*?');
-        if (!not) {
-            self[key] = {
-                $regex: regString,
-                $options: 'i'
-            };
-        }
-        else {
-            self[key] = { $not: regString }
-        }
+        self[key] = {
+            $regex: regString,
+            $options: 'i'
+        };
+
     },
-    ['in']: (self, key, value, not) => {
-        self[key] = not ? { $nin: value } : { $in: value }
+    ['in']: (self, key, value) => {
+        self[key] = { $in: value }
     },
     ['date']: (self, key, value) => {
         self[key] = _parseDateQuery(value);
     },
-    ['empty']: (self, key, value, not) => {
+    ['empty']: (self, key) => {
         self[key] = {
-            $exists: not
+            $exists: false
         };
     },
-    ['exists']: (self, key, value, not) => {
+    ['exists']: (self, key) => {
         self[key] = {
-            $exists: !not
+            $exists: true
         };
     },
     ['>']: (self, key, value) => {
@@ -179,16 +175,16 @@ class MongoDBParser {
         this.map = Parser.config.keymap[this.option.keyLang] || {};
     }
 
-    evaluate(node, not = false) {
+    evaluate(node) {
         if (node.hasOwnProperty('expression')) {
-            var exp = this.evaluate(node.expression, not);
+            var exp = this.evaluate(node.expression);
             return exp
         }
 
-        if (node.type === 'binary' && !not) {
+        if (node.type === 'binary') {
             node = node.content;
-            var left = this.evaluate(node.left, not);
-            var right = this.evaluate(node.right, not);
+            var left = this.evaluate(node.left);
+            var right = this.evaluate(node.right);
             if (node.operator === 'or') {
                 return [].concat(left, right);
             }
@@ -200,7 +196,7 @@ class MongoDBParser {
         if (node.type === 'unary') {
             node = node.content;
             if (node.operator === '!' || node.operator === 'not') {
-                var expression = this.evaluate(node.expression, not);
+                var expression = this.evaluate(node.expression);
                 let nor = { $nor: [expression] };
                 if (isArray(expression)) {
                     nor = {
@@ -214,12 +210,12 @@ class MongoDBParser {
             }
         }
         if (node.type === 'comparison') {
-            return this._genComparison(node.content, not);
+            return this._genComparison(node.content);
         }
         return {}
     }
 
-    _genComparison(node, not) {
+    _genComparison(node) {
         /* {
           "comparator": ":",
           "key": "C",
@@ -231,7 +227,7 @@ class MongoDBParser {
         var result = {};
 
         if (comparatorController[comparator]) {
-            comparatorController[comparator](result, key, value, not)
+            comparatorController[comparator](result, key, value)
         }
 
         return result;
