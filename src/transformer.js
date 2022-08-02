@@ -1,5 +1,5 @@
-const { Parser } = require('./parser');
-const { Preprocess } = require('./preprocess');
+const Parser = require('./parser');
+const Preprocess = require('./preprocess');
 const MongoDBPlugin = require('./plugins/mongodb');
 
 /**

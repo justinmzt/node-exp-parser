@@ -1,7 +1,7 @@
 // Syntax Tree MongoDB Plugin
 // BUG => AlertName != "SYSTEM DOWN - SERVER" and AlertName!= "SNMP NOT RESPONDING - SERVER" =>DOUBLE KEY
 
-const { Parser } = require('../parser');
+const Parser = require('../parser');
 const comparatorController = {
     ['=']: (self, key, value) => {
         self[key] = value;

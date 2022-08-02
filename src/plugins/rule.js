@@ -1,7 +1,7 @@
 // Syntax Tree Regular Rule Plugin
 
-const { Parser } = require('../parser');
-const { Preprocess } = require('../preprocess');
+const Parser = require('../parser');
+const Preprocess = require('../preprocess');
 
 const comparatorController = {
     ['=']: (target, key, value) => {

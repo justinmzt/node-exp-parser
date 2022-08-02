@@ -1,13 +1,7 @@
-const {
-    Token,
-    Tokenizer,
-    Parser,
-} = require('./src/parser');
+const Parser = require('./src/parser');
 const Transformer = require('./src/transformer');
 const Rule = require('./src/plugins/rule');
 
-exports.Token = Token;
-exports.Tokenizer = Tokenizer;
 exports.Parser = Parser;
 
 /**

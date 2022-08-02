@@ -66,6 +66,7 @@ const testErr = () => {
         }
         catch (e) {
             console.error('***Error***');
+            console.error(e)
             console.error(e.message)
         }
         console.log('----------------------------------------------');
@@ -100,5 +101,6 @@ if (errExps.length) {
     return process.exit(1)
 }
 
+testErr();
+
 process.exit(0);
-// testErr();

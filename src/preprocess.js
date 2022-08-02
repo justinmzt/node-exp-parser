@@ -1,4 +1,3 @@
-
 // 数据预处理
 
 const COMPARATOR_SET = new Set(['>', '<', '>=', '<=']);
@@ -138,4 +137,4 @@ class Preprocess {
 
 }
 
-exports.Preprocess = Preprocess;
+module.exports = Preprocess;
