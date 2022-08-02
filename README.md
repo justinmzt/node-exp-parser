@@ -121,6 +121,7 @@ const json = Parser.ttof({"type":"comparison","content":{"comparator":"=","key":
 ```js
 const tree = Parser.ftot({"afterOperator":"and","children":[{"comparator":"=","key":"a","value":"1","afterOperator":"and"}]})
 // "{"type":"comparison","content":{"comparator":"=","key":"a","value":"1","afterOperator":"and"}}"
+```
 
 ### 7. Rule Check
 
