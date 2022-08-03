@@ -1,8 +1,9 @@
 class Exception extends Error {
-    constructor(process, type, lastToken) {
+    constructor(process, type, lastToken, data) {
         super();
         this.type = type;
         this.lastToken = lastToken;
+        this.data = data;
 
         this.lastTokenValue = lastToken ? process.restore(lastToken.value) || '' : '';
         this.lastTokenType = lastToken ? lastToken.type || '' : '';

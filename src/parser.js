@@ -59,7 +59,9 @@ class Parser {
 
         var valueToken = this.tokenizer.next();
         if (!valueToken.isValue()) {
-            throw this.process.error('VALUE', this.tokenizer.last());
+            throw this.process.error('VALUE', this.tokenizer.last(), {
+                key: this.process.restore(keyToken.value)
+            });
         }
 
         const restoredValue = this.process.restore(valueToken.value);

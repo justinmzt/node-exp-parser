@@ -11,6 +11,9 @@ const validate = (expression) => {
         self.errValue = e.lastTokenValue;
         self.errType = e.type;
         self.offset = e.offset;
+        if (e.data && e.data.key) {
+            self.key = e.data.key
+        }
         // console.error(e)
     }
     return self

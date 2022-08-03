@@ -173,13 +173,13 @@ const validation4_2 = Parser.validate('a: "t"est 5224"');
 const validation5 = Parser.validate('a: [1,2, 3, 4]  and c: "\$" !');
 // { "result": false, "errValue": "!", "errType": "NOT_OPERATOR_ERROR", "offset": 28 }
 
-// 缺少 VALUE
+// 缺少 VALUE，此时会同步输出所在语句的 KEY 值
 const validation6_1 = Parser.validate('a:   and b:1');
-// { "result": false, "errValue": "and", "errType": "VALUE", "offset": 5 }
+// { "result": false, "errValue": "and", "errType": "VALUE", "offset": 5, "key": "a" }
 const validation6_1 = Parser.validate('a:   not b:1');
-// { "result": false, "errValue": "not", "errType": "VALUE", "offset": 5 }
+// { "result": false, "errValue": "not", "errType": "VALUE", "offset": 5, "key": "a" }
 const validation6_1 = Parser.validate('a:   ');
-// { "result": false, "errValue": "", "errType": "VALUE", "offset": 5 }
+// { "result": false, "errValue": "", "errType": "VALUE", "offset": 5, "key": "a" }
 
 // 缺少 KEY
 const validation7_1 = Parser.validate('(');

@@ -194,8 +194,8 @@ class Preprocess {
         }
     }
 
-    error(type, lastToken) {
-        return new Exception(this, type, lastToken)
+    error(type, lastToken, data) {
+        return new Exception(this, type, lastToken, data)
     }
 
 }
