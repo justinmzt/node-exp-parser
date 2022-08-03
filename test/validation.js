@@ -1,17 +1,17 @@
 const Parser = require('../index');
 const ruleExp = [
     [
-        'a:1 and (b: "test")',
-        true,
-        '',
-        '',
-    ], // 正常情况
-    [
         'a:1 and (b: "test"',
         false,
         'MISSING )',
         18,
     ], // 括号未闭合
+    [
+        'a:1 and (b: "test" or (c: 2 and d:3)',
+        false,
+        'MISSING )',
+        36,
+    ], // 多个括号未闭合
     [
         'b: "test',
         false,
@@ -31,16 +31,16 @@ const ruleExp = [
         6,
     ], // 缺少逻辑符号，原因是引号提前闭合
     [
+        'a dun',
+        false,
+        'OPERATOR',
+        2
+    ], // 缺少逻辑符号，也可以是缺少运算符号
+    [
         'a:\\!',
         false,
         'NOT_OPERATOR_ERROR',
         3,
-    ], // 多余的 NOT 符号
-    [
-        'a:\\not',
-        true,
-        '',
-        '',
     ], // 多余的 NOT 符号
     [
         'a:\\ not',
@@ -72,7 +72,36 @@ const ruleExp = [
         'NOT_OPERATOR_ERROR',
         28
     ], // 测试 token 的长度是否正确，带数组，数组内还有空格
-
+    [
+        'a:   and b:1',
+        false,
+        'VALUE',
+        5
+    ], // 缺少 VALUE 1
+    [
+        'a:   not b:1',
+        false,
+        'VALUE',
+        5
+    ], // 缺少 VALUE 2
+    [
+        'a:   ',
+        false,
+        'VALUE',
+        5
+    ], // 缺少 VALUE 3
+    [
+        '(',
+        false,
+        'KEY',
+        1
+    ], // 缺少 KEY
+    [
+        'and a:1',
+        false,
+        'KEY',
+        0
+    ], // 缺少 KEY
 ];
 
 module.exports = {

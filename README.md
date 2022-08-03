@@ -162,13 +162,31 @@ const validation2 = Parser.validate('a:1 and (b: "test"');
 const validation3 = Parser.validate('a:1 and (b: \\"test');
 // { "result": false, "errValue": "\"", "errType": "EXCEPTION", "offset": 13 }
 
-// 缺少逻辑符号，原因是引号提前闭合
-const validation4 = Parser.validate('a: "t"est 5224"');
+// 缺少逻辑符号，也可以是缺少运算符号
+const validation4_1 = Parser.validate('a dun');
+// { "result": false, "errValue": "dun", "errType": "OPERATOR", "offset": 2 }
+// 引号提前闭合
+const validation4_2 = Parser.validate('a: "t"est 5224"');
 // { "result": false, "errValue": "est", "errType": "OPERATOR", "offset": 6 }
 
 // 错误的 NOT 符号
-const validation4 = Parser.validate('a: [1,2, 3, 4]  and c: "\$" !');
+const validation5 = Parser.validate('a: [1,2, 3, 4]  and c: "\$" !');
 // { "result": false, "errValue": "!", "errType": "NOT_OPERATOR_ERROR", "offset": 28 }
+
+// 缺少 VALUE
+const validation6_1 = Parser.validate('a:   and b:1');
+// { "result": false, "errValue": "and", "errType": "VALUE", "offset": 5 }
+const validation6_1 = Parser.validate('a:   not b:1');
+// { "result": false, "errValue": "not", "errType": "VALUE", "offset": 5 }
+const validation6_1 = Parser.validate('a:   ');
+// { "result": false, "errValue": "", "errType": "VALUE", "offset": 5 }
+
+// 缺少 KEY
+const validation7_1 = Parser.validate('(');
+// { "result": false, "errValue": "", "errType": "KEY", "offset": 1 }
+const validation7_2 = Parser.validate('and b:1');
+// { "result": false, "errValue": "and", "errType": "KEY", "offset": 0 }
+
 
 ```
 

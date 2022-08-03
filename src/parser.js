@@ -94,6 +94,8 @@ class Parser {
                 throw this.process.error('MISSING )', this.tokenizer.last());
             }
         }
+        this.tokenizer.next();
+        throw this.process.error('KEY', this.tokenizer.last());
     }
 
     // Unary ::= Primary |
