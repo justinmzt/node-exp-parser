@@ -251,9 +251,4 @@ module.exports = {
             '{"a":"sdf*"}',
         ],
     ],
-    // 错误输入
-    errorExp: [
-        'a: 1 and b: 2 or (c: 3 or d: 4', // 括号未闭合
-        // 'a: "Win"dows 7 SP2 Enterprise"', // 引号里的引号没被转义
-    ],
 }

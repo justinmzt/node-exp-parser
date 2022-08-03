@@ -46,12 +46,17 @@ class Tokenizer {
         { type: 'operator', content: /^(not) ?|^(and) ?|^(or) ?|^(&&) ?|^(\|\|) ?|^(\() ?|^(\)) ?|^(!) ?/ },
         {
             type: 'string',
-            content: /^ *(([\u2E80-\uFFFDa-zA-Z0-9-_\.\*%\\\/\.\$]+)|(\'[\u2E80-\uFFFDa-zA-Z0-9-_\.\*%\(\)\\\/\.\$ ]+\')|(\"[\u2E80-\uFFFDa-zA-Z0-9-_\.\*%\(\)\\\/\.\$ ]+\")) */
+            content: /^ *(([\u2E80-\uFFFDa-zA-Z0-9-_\.\*%\\\/\.\$]+)|("(?:.*?(?<!\\\\))")) */
         },
+        {
+            type: 'exception',
+            content: /^ *[^\u2E80-\uFFFDa-zA-Z0-9-_\.\*%\\\/\.\$]+/
+        }
         //'string': /^ *(([a-zA-Z0-9-_\.\*%:\\\/\.]{1,})|([\'\"][a-zA-Z0-9-_\.\*%:\(\)\\\/\. ]{1,}[\'\"])) */
     ];
 
-    constructor(expression) {
+    constructor(process, expression) {
+        this.process = process;
         this.tokens = [];
         this.originalExpression = expression;
         this.expression = expression;
@@ -76,6 +81,12 @@ class Tokenizer {
                 token = new Token(type, ((match[1] || match[0]).trim()));
                 break;
             }
+        }
+
+        if (token && token.type === 'exception') {
+            this.tokens.push(token);
+            this.expression = this.expression.replace(token.value, '');
+            throw this.process.error('EXCEPTION', this.last())
         }
 
         return token ? token : new Token('END', '');

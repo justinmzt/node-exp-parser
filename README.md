@@ -57,7 +57,7 @@ ES6
 
 ## API
 
-### 1. Expression To Syntax Binary Tree
+### 1. Expression To Syntax Tree
 
 **Parser.etot(expression)**
 
@@ -134,8 +134,33 @@ const tree = Parser.ftot({"afterOperator":"and","children":[{"comparator":"=","k
 ```js
 const result = Parser.check({ a: 1, b: 3, c: 4, d: 5 }, 'a: 1 or b: 2 and (c: 3 or d: 4)');
 // false
-const result = Parser.check({ a: 1, b: 3, c: 4, d: 5 }, 'a: 1 or (b: 2 and (c: 3 or d: 4))');
+const result2 = Parser.check({ a: 1, b: 3, c: 4, d: 5 }, 'a: 1 or (b: 2 and (c: 3 or d: 4))');
 // true
+```
+
+### 7. Validation
+
+**Parser.validate(expression)**
+- `expression`: The expression string.
+
+```js
+
+// 通过验证
+const validation = Parser.validate('a:1 and (b: "test")');
+// { "result": true }
+
+// 括号未闭合
+const validation2 = Parser.validate('a:1 and (b: "test"');
+// { "result": false, "errValue": "test", "errType": "MISSING )" }
+
+// 匹配特殊字符
+const validation3 = Parser.validate('a:1 and (b: \\"test');
+// { "result": false, "errValue": "\"", "errType": "EXCEPTION" }
+
+// 缺少逻辑符号，原因是引号提前闭合
+const validation4 = Parser.validate('a: "t"est 5224"');
+// { "result": false, "errValue": "est", "errType": "OPERATOR" }
+
 ```
 
 ## Syntax
@@ -151,7 +176,7 @@ const result = Parser.check({ a: 1, b: 3, c: 4, d: 5 }, 'a: 1 or (b: 2 and (c: 3
 ### 3. 模糊匹配，需要使用“*”
 例：
 - a: test*（匹配前缀为 test 的信息）
-- a: *test*（匹配包含 test 的所有信息）
+- a: \*test\*（匹配包含 test 的所有信息）
 
 ### 4. 空值匹配
 例：

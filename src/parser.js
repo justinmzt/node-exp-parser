@@ -1,12 +1,12 @@
-const Exception = require("./exception");
 const Tokenizer = require("./tokenizer");
+
 class Parser {
     static config = {
         keymap: {}
     };
 
     static setKeymap(list) {
-        if (!list instanceof Array){
+        if (!list instanceof Array) {
             return
         }
         Parser.config.keymap = {};
@@ -29,7 +29,9 @@ class Parser {
     constructor(process) {
         this.process = process;
         this.expression = process.exp;
-        this.tokenizer = this.expression ? new Tokenizer(this.expression) : new Tokenizer('');
+        this.tokenizer = this.expression ?
+            new Tokenizer(this.process, this.expression) :
+            new Tokenizer(this.process, '');
     }
 
     // Condition ::= Key '=' Value |
@@ -39,7 +41,7 @@ class Parser {
     _parseCondition() {
         var keyToken = this.tokenizer.next();
         if (!keyToken.isKey() && !keyToken.isValue()) {
-            throw new Exception('KEY', this.tokenizer.last());
+            throw this.process.error('KEY', this.tokenizer.last());
         }
         var compToken = this.tokenizer.peek();
         if (compToken && compToken.isComparator()) {
@@ -52,12 +54,12 @@ class Parser {
             }
         }
         if (!compToken || !compToken.isComparator()) {
-            throw new Exception('COMPARATOR', this.tokenizer.last());
+            throw this.process.error('COMPARATOR', this.tokenizer.last());
         }
 
         var valueToken = this.tokenizer.next();
         if (!valueToken.isValue()) {
-            throw new Exception('VALUE', this.tokenizer.last());
+            throw this.process.error('VALUE', this.tokenizer.last());
         }
 
         const restoredValue = this.process.restore(valueToken.value);
@@ -88,7 +90,7 @@ class Parser {
             if (token.isOperator() && token.value === ')') {
                 return exp
             } else {
-                throw new Exception(')');
+                throw this.process.error('MISSING )', this.tokenizer.last());
             }
         }
     }
@@ -122,7 +124,7 @@ class Parser {
             token = this.tokenizer.next();
             right = this._parseUnary();
             if (!right) {
-                throw new Exception('EXPRESSION', token);
+                throw this.process.error('EXPRESSION', token);
             }
             return this._parseAndExp({
                 type: "binary",
@@ -134,7 +136,7 @@ class Parser {
             })
         }
         else if (!token.isEnd() && !token.isOperator()) {
-            throw new Exception('OPERATOR', token);
+            throw this.process.error('OPERATOR', token);
         }
 
         return left;
@@ -144,14 +146,14 @@ class Parser {
     _parseExpression() {
         var left = this._parseUnary();
         var exp = this._parseAndExp(left);
-        if (!exp) throw new Exception('EXPRESSION', this.tokenizer.last());
+        if (!exp) throw this.process.error('EXPRESSION', this.tokenizer.last());
 
         return exp
     }
 
     parse(expression) {
         if (expression) {
-            this.tokenizer = new Tokenizer(expression);
+            this.tokenizer = new Tokenizer(this.process, expression);
         }
         if (!this.expression) {
             return {}

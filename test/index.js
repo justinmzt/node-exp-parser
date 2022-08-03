@@ -48,31 +48,6 @@ const test = (list, option) => {
     return errExps
 };
 
-const testErr = () => {
-    for (let i = 0; i < data.errorExp.length; i++) {
-        const self = {};
-        if (data.errorExp[i] instanceof Array) {
-            self.exp = data.errorExp[i][0];
-            self.expectValue = data.errorExp[i][1];
-        }
-        else {
-            self.exp = data.errorExp[i]
-        }
-        console.log(self.exp, '***********Expression');
-        try {
-            const result = Parser.etot(self.exp);
-            console.log(JSON.stringify(result), "***********Syntax Tree");
-            console.log(JSON.stringify(Parser.etom(self.exp)), "***********MongoDB Query");
-        }
-        catch (e) {
-            console.error('***Error***');
-            console.error(e)
-            console.error(e.message)
-        }
-        console.log('----------------------------------------------');
-    }
-};
-
 let errExps = test(data.exp);
 if (errExps.length) {
     return process.exit(1)
@@ -94,13 +69,19 @@ if (errExps.length) {
 // 规则测试
 const { ruleTest } = require('./rule');
 
-// 设置 key 映射为中文
 errExps = ruleTest();
 
 if (errExps.length) {
     return process.exit(1)
 }
 
-testErr();
+// 规则测试
+const { validationTest } = require('./validation');
+
+errExps = validationTest();
+
+if (errExps.length) {
+    return process.exit(1)
+}
 
 process.exit(0);

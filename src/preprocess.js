@@ -1,5 +1,7 @@
 // 数据预处理
 
+const Exception = require("./exception");
+
 const COMPARATOR_SET = new Set(['>', '<', '>=', '<=']);
 
 class Preprocess {
@@ -16,7 +18,7 @@ class Preprocess {
         /* 正则 */
         this.backslashReg = new RegExp(/\\\\\\\\/g);
         // 匹配非转义斜杆
-        this.stringReg = new RegExp(/"(.*?(?<!\\\\))"/);
+        this.stringReg = new RegExp(/(?<!\\\\)"(.*?(?<!\\\\))"/);
         this.arrayReg = new RegExp(/\[.*?(?<!\\\\)\]/);
         this.timeFunctionReg = new RegExp(/TIME *\(.*?\)/);
         this.stringReplacementReg = new RegExp(/(?<!\\)\$\d+/g);
@@ -133,6 +135,10 @@ class Preprocess {
             }
             return comparator
         }
+    }
+
+    error(type, lastToken) {
+        return new Exception(this, type, lastToken)
     }
 
 }

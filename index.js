@@ -1,5 +1,6 @@
 const Parser = require('./src/parser');
 const Transformer = require('./src/transformer');
+const { validate } = require('./src/validation');
 const Rule = require('./src/plugins/rule');
 
 exports.Parser = Parser;
@@ -50,3 +51,9 @@ exports.ftot = Transformer.ftot;
  * @param option.keyLang: 表达式 key 的语言，对应 keymap
  */
 exports.check = Rule.exec;
+
+/**
+ * @function 验证表达式
+ * @param expression
+ */
+exports.validate = validate;
