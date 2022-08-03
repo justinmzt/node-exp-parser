@@ -10,7 +10,7 @@ const ruleExp = [
         'a:1 and (b: "test"',
         false,
         'MISSING )',
-        12,
+        18,
     ], // 括号未闭合
     [
         'b: "test',

@@ -99,7 +99,7 @@ class Tokenizer {
             throw this.process.error('EXCEPTION', this.last())
         }
 
-        return token ? token : new Token('END', '');
+        return token ? token : new Token('END', '', this.offset);
     }
 
     next() {
@@ -113,8 +113,7 @@ class Tokenizer {
     }
 
     last() {
-        return this.tokens[this.tokens.length - 1].type === 'END' ?
-            this.tokens[this.tokens.length - 2] : this.tokens[this.tokens.length - 1];
+        return this.tokens[this.tokens.length - 1];
     }
 }
 

@@ -156,7 +156,7 @@ const validation = Parser.validate('a:1 and (b: "test")');
 
 // 括号未闭合
 const validation2 = Parser.validate('a:1 and (b: "test"');
-// { "result": false, "errValue": "test", "errType": "MISSING )", "offset": 12 }
+// { "result": false, "errValue": "test", "errType": "MISSING )", "offset": 18 }
 
 // 匹配特殊字符
 const validation3 = Parser.validate('a:1 and (b: \\"test');

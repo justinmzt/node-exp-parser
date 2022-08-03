@@ -89,7 +89,8 @@ class Parser {
             token = this.tokenizer.next();
             if (token.isOperator() && token.value === ')') {
                 return exp
-            } else {
+            }
+            else {
                 throw this.process.error('MISSING )', this.tokenizer.last());
             }
         }
