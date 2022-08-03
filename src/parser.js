@@ -135,6 +135,9 @@ class Parser {
                 }
             })
         }
+        else if (token.isNot()) {
+            throw this.process.error('NOT_OPERATOR_ERROR', token);
+        }
         else if (!token.isEnd() && !token.isOperator()) {
             throw this.process.error('OPERATOR', token);
         }

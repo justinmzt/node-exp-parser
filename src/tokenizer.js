@@ -1,7 +1,8 @@
 class Token {
-    constructor(type, value) {
+    constructor(type, value, offset) {
         this.type = type;
         this.value = value.trim();
+        this.offset = offset;
     }
 
     isKey() {
@@ -46,11 +47,11 @@ class Tokenizer {
         { type: 'operator', content: /^(not) ?|^(and) ?|^(or) ?|^(&&) ?|^(\|\|) ?|^(\() ?|^(\)) ?|^(!) ?/ },
         {
             type: 'string',
-            content: /^ *(([\u2E80-\uFFFDa-zA-Z0-9-_\.\*%\\\/\.\$]+)|("(?:.*?(?<!\\\\))")) */
+            content: /^ *([\u2E80-\uFFFDa-zA-Z0-9-_=`,.\/@#$%\^*\\]+|"(?:.*?(?<!\\\\))") */
         },
         {
             type: 'exception',
-            content: /^ *[^\u2E80-\uFFFDa-zA-Z0-9-_\.\*%\\\/\.\$]+/
+            content: /^ *[^\u2E80-\uFFFDa-zA-Z0-9-_=`,.\/@#$%\^*\\]+/
         }
         //'string': /^ *(([a-zA-Z0-9-_\.\*%:\\\/\.]{1,})|([\'\"][a-zA-Z0-9-_\.\*%:\(\)\\\/\. ]{1,}[\'\"])) */
     ];
@@ -60,11 +61,20 @@ class Tokenizer {
         this.tokens = [];
         this.originalExpression = expression;
         this.expression = expression;
+        this.offset = 0;
+    }
+
+    trimStart() {
+        if (this.expression && this.expression.length) {
+            const newExp = this.expression.replace(/^\s+/, '');
+            this.offset += (this.expression.length - newExp.length);
+            this.expression = newExp
+        }
     }
 
     peek() {
         let token = null;
-        this.expression = this.expression.trim();
+        this.trimStart();
         for (let i = 0; i < Tokenizer.reg.length; i++) {
             let type = Tokenizer.reg[i].type;
             const reg = Tokenizer.reg[i].content;
@@ -78,7 +88,7 @@ class Tokenizer {
                     }
                 }
 
-                token = new Token(type, ((match[1] || match[0]).trim()));
+                token = new Token(type, ((match[1] || match[0]).trim()), this.offset);
                 break;
             }
         }
@@ -95,7 +105,10 @@ class Tokenizer {
     next() {
         const token = this.peek();
         this.tokens.push(token);
-        this.expression = this.expression.replace(token.value, '');
+        const newExp = this.expression.replace(token.value, '');
+
+        this.offset += this.process.getLength(token.value, token.value.length);
+        this.expression = newExp;
         return token;
     }
 

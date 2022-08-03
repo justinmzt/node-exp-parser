@@ -10,6 +10,7 @@ const validate = (expression) => {
         self.result = false;
         self.errValue = e.lastTokenValue;
         self.errType = e.type;
+        self.offset = e.offset;
         // console.error(e)
     }
     return self

@@ -6,6 +6,7 @@ class Exception extends Error {
 
         this.lastTokenValue = lastToken ? process.restore(lastToken.value) || '' : '';
         this.lastTokenType = lastToken ? lastToken.type || '' : '';
+        this.offset = lastToken ? lastToken.offset : null;
         this.name = 'Error';
         this.message = 'Expecting ' + type + ', last Token: ' + this.lastTokenValue + ' (' + this.lastTokenType + ')';
     }

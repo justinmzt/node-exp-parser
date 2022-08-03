@@ -142,6 +142,11 @@ const result2 = Parser.check({ a: 1, b: 3, c: 4, d: 5 }, 'a: 1 or (b: 2 and (c: 
 
 **Parser.validate(expression)**
 - `expression`: The expression string.
+- Returns: `Validation`
+  - `result`: `<boolean>` 验证结果
+  - `errValue`: 错误字符串
+  - `errType`: 错误类型
+  - `offset`: 错误位置的偏移量
 
 ```js
 
@@ -151,15 +156,19 @@ const validation = Parser.validate('a:1 and (b: "test")');
 
 // 括号未闭合
 const validation2 = Parser.validate('a:1 and (b: "test"');
-// { "result": false, "errValue": "test", "errType": "MISSING )" }
+// { "result": false, "errValue": "test", "errType": "MISSING )", "offset": 12 }
 
 // 匹配特殊字符
 const validation3 = Parser.validate('a:1 and (b: \\"test');
-// { "result": false, "errValue": "\"", "errType": "EXCEPTION" }
+// { "result": false, "errValue": "\"", "errType": "EXCEPTION", "offset": 13 }
 
 // 缺少逻辑符号，原因是引号提前闭合
 const validation4 = Parser.validate('a: "t"est 5224"');
-// { "result": false, "errValue": "est", "errType": "OPERATOR" }
+// { "result": false, "errValue": "est", "errType": "OPERATOR", "offset": 6 }
+
+// 错误的 NOT 符号
+const validation4 = Parser.validate('a: [1,2, 3, 4]  and c: "\$" !');
+// { "result": false, "errValue": "!", "errType": "NOT_OPERATOR_ERROR", "offset": 28 }
 
 ```
 

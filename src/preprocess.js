@@ -6,10 +6,11 @@ const COMPARATOR_SET = new Set(['>', '<', '>=', '<=']);
 
 class Preprocess {
     constructor(exp) {
-        this.origin = exp;
+        // 空白符均变为空格
+        this.origin = exp.replace(/\s/g, ' ');
 
         // 转化 \\, $ 符号为 "\\\\" "\\$"
-        this.exp = exp.replace(/[\\$]/g, (a) => {
+        this.exp = this.origin.replace(/[\\$]/g, (a) => {
             return "\\" + a
         });
         this.map = {};
@@ -109,6 +110,62 @@ class Preprocess {
 
         return input
 
+    }
+
+    getLength(input, l) {
+        // const r = Math.random();
+        // console.log(input, l, 'input', r);
+        // 复原日期
+        if (input.match(this.timeReplacementReg)) {
+            input = input.replace(this.timeReplacementReg, (a) => {
+                if (this.map[a]) {
+                    l += (this.map[a].length - a.length - 1) // -1 为补充的空格
+                }
+                return this.map[a]
+            });
+            input.substring(5, input.length - 1).split(',').forEach(item => {
+                const str = item.trim();
+                const newLength = this.getLength(str, str.length);
+                l += (newLength - str.length)
+            });
+            return l;
+        }
+        // 复原数组
+        if (input.match(this.arrayReplacementReg)) {
+            input = input.replace(this.arrayReplacementReg, (a) => {
+                if (this.map[a]) {
+                    l += (this.map[a].length - a.length - 1) // -1 为补充的空格
+                }
+                return this.map[a]
+            });
+            input.substring(1, input.length - 1).split(',').forEach(item => {
+                const str = item.trim();
+                const newLength = this.getLength(str, str.length);
+                l += (newLength - str.length)
+            });
+            return l;
+        }
+
+        // 复原字符串
+        input = input.replace(this.stringReplacementReg, (a) => {
+            if (this.map[a]) {
+                l += (this.map[a].length - a.length + 2 - 1) // +2 前后两个引号 -1 为补充的空格
+            }
+            return this.map[a]
+        });
+        // 复原反斜杠
+        input = input.replace(this.backslashTokenReg, a => {
+            l -= (this.backslashToken - 4);
+            return '\\\\\\\\'
+        });
+        // 复原 $
+        input = input.replace(/\\([\\$])/g, (a, b) => {
+            l -= 1;
+            return b
+        });
+
+        // console.log( l, 'output', r);
+        return l
     }
 
     getComparator(value, restoredValue, comparator) {
