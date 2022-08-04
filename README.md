@@ -136,6 +136,8 @@ const result = Parser.check({ a: 1, b: 3, c: 4, d: 5 }, 'a: 1 or b: 2 and (c: 3 
 // false
 const result2 = Parser.check({ a: 1, b: 3, c: 4, d: 5 }, 'a: 1 or (b: 2 and (c: 3 or d: 4))');
 // true
+const result3 = Parser.check({ a: { b: 5 } }, 'a.b: 5');
+// true
 ```
 
 ### 7. Validation

@@ -155,6 +155,15 @@ function _parseDateQuery(value) {
     }
 }
 
+// 初始化字典
+const iterator = (dict, target, keys) => {
+    if (Object.prototype.toString.call(target) !== '[object Object]') {
+        return dict[keys.join('.')] = target
+    }
+    Object.keys(target).forEach(key => {
+        iterator(dict, target[key], [...keys, key])
+    })
+};
 
 class Rule {
     constructor(option) {
@@ -235,7 +244,9 @@ function exec(target, expression, option) {
     const parser = new Parser(process);
     const exp = parser.parse();
     const rule = new Rule(option);
-    return rule.evaluate(exp, target);
+    const dict = {};
+    iterator(dict, target, []);
+    return rule.evaluate(exp, dict);
 }
 
 module.exports = {

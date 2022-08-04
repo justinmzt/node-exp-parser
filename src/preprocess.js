@@ -29,8 +29,8 @@ class Preprocess {
         this.timeTokenReg = new RegExp(/^(?<!\\)\$_date_\d+$/);
         this.astriskReg = new RegExp(/^(?<!\\)\*$/);
 
-        // 转化转义后的反斜杠 TODO: token 根据文本生成
-        this.backslashToken = 'sdafgadserbvcxnyudyhdghd';
+        // 转化转义后的反斜杠
+        this.generateBackslashToken();
         this.backslashTokenReg = new RegExp(this.backslashToken, 'g');
         this.exp = this.exp.replace(this.backslashReg, this.backslashToken);
 
@@ -44,6 +44,16 @@ class Preprocess {
         this.replaceExp(this.timeFunctionReg, '_date_');
 
 
+    }
+
+    generateBackslashToken() {
+        while (true) {
+            const token = (Math.random() * 1000000000).toString().replace('.', '');
+            if (!this.origin.match(token)) {
+                this.backslashToken = token;
+                break
+            }
+        }
     }
 
     replaceString() {
