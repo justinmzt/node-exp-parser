@@ -1,6 +1,13 @@
 const Parser = require('./parser');
 const Preprocess = require('./preprocess');
 
+const getValue = (expression, from, to) => {
+    if (!expression || from === undefined || to === undefined) {
+        return ''
+    }
+    return expression.substring(from, to)
+};
+
 const validate = (expression, pos) => {
     pos = pos || expression.length;
     if (pos > expression.length) {
@@ -33,7 +40,7 @@ const validate = (expression, pos) => {
             from: token.from,
             to: token.to,
             type: token.type,
-            value: token.value,
+            value: getValue(process.origin, token.from, token.to),
         }
     }
     return self

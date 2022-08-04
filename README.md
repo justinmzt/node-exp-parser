@@ -209,6 +209,29 @@ const validation7_3 = Parser.validate('a:1 and not');
 
 
 ```
+```js
+// 一些查询位置的例子
+const validation8_1 = Parser.validate('a<=TIME("2010/11/30*","2010/12/31*")', 2);
+// {
+//     "result": true,
+//     "token": { "from": 1, "to": 3, "type": "comparator", "value": "<=" }
+// }
+const validation8_2 = Parser.validate('a<=TIME("2010/11/30*",         "2010/12/31*")and b:1', 4);
+// {
+//     "result": true,
+//     "token": { "from": 3, "to": 45, "type": "value", "value": "TIME(\"2010/11/30*\",         \"2010/12/31*\")" }
+// }
+const validation8_3 = Parser.validate('a:[1,       3,       "fsdf"] and b:1', 4);
+// {
+//     "result": true,
+//     "token": { "from": 2, "to": 28, "type": "value", "value": "[1,       3,       \"fsdf\"]" }
+// }
+const validation8_4 = Parser.validate('a: TIME("2010/10/10*")  and c: "\$" !', 5);
+// {
+//     "result": false, "errValue": "!", "errType": "NOT_OPERATOR_ERROR", "offset": 36,
+//     "token": { "from": 3, "to": 22, "type": "value", "value": "TIME(\"2010/10/10*\")" }
+// }
+```
 
 ## Syntax
 

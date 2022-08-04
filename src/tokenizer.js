@@ -73,6 +73,10 @@ class Tokenizer {
         if (this.expression && this.expression.length) {
             const newExp = this.expression.replace(/^\s+/, '');
             this.offset += (this.expression.length - newExp.length);
+            if (this.replacement) {
+                this.offset -= 1;
+                this.replacement = false;
+            }
             this.expression = newExp
         }
     }
@@ -112,7 +116,11 @@ class Tokenizer {
         this.tokens.push(token);
 
         const newExp = this.expression.replace(token.value, '');
-        this.offset += this.process.getLength(token.value, token.value.length);
+        const lengthObj = this.process.getLength(token.value, token.value.length);
+        this.offset += lengthObj.l;
+        if (lengthObj.replacement) {
+            this.replacement = lengthObj.replacement // 自动填充空格复原
+        }
         token.setEndOffset(this.offset);
         this.expression = newExp;
 

@@ -108,12 +108,6 @@ const ruleExp = [
         'KEY',
         11
     ], // 缺少 KEY 3
-    [
-        'a:1 and (b: "test")',
-        true,
-        '',
-        ''
-    ], // 正常情况，测试 POS
 ];
 
 module.exports = {

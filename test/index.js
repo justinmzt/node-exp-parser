@@ -75,10 +75,19 @@ if (errExps.length) {
     return process.exit(1)
 }
 
-// 规则测试
+// 验证接口测试
 const { validationTest } = require('./validation');
 
 errExps = validationTest();
+
+if (errExps.length) {
+    return process.exit(1)
+}
+
+// 验证接口光标位置测试
+const { validationPosTest } = require('./validation_pos');
+
+errExps = validationPosTest();
 
 if (errExps.length) {
     return process.exit(1)

@@ -115,41 +115,53 @@ class Preprocess {
     getLength(input, l) {
         // const r = Math.random();
         // console.log(input, l, 'input', r);
+        const self = {
+            replacement: false
+        };
         // 复原日期
         if (input.match(this.timeReplacementReg)) {
             input = input.replace(this.timeReplacementReg, (a) => {
                 if (this.map[a]) {
-                    l += (this.map[a].length - a.length - 1) // -1 为补充的空格
+                    self.replacement = true;
+                    l += (this.map[a].length - a.length)
                 }
                 return this.map[a]
             });
             input.substring(5, input.length - 1).split(',').forEach(item => {
                 const str = item.trim();
-                const newLength = this.getLength(str, str.length);
-                l += (newLength - str.length)
+                const obj = this.getLength(str, str.length);
+                l += (obj.l - str.length);
+                if (obj.replacement) {
+                    l -= 1
+                }
             });
-            return l;
+            return { l, replacement: self.replacement };
         }
         // 复原数组
         if (input.match(this.arrayReplacementReg)) {
             input = input.replace(this.arrayReplacementReg, (a) => {
                 if (this.map[a]) {
-                    l += (this.map[a].length - a.length - 1) // -1 为补充的空格
+                    self.replacement = true;
+                    l += (this.map[a].length - a.length)
                 }
                 return this.map[a]
             });
             input.substring(1, input.length - 1).split(',').forEach(item => {
                 const str = item.trim();
-                const newLength = this.getLength(str, str.length);
-                l += (newLength - str.length)
+                const obj = this.getLength(str, str.length);
+                l += (obj.l - str.length);
+                if (obj.replacement) {
+                    l -= 1
+                }
             });
-            return l;
+            return { l, replacement: self.replacement };
         }
 
         // 复原字符串
         input = input.replace(this.stringReplacementReg, (a) => {
             if (this.map[a]) {
-                l += (this.map[a].length - a.length + 2 - 1) // +2 前后两个引号 -1 为补充的空格
+                self.replacement = true;
+                l += (this.map[a].length - a.length + 2) // +2 前后两个引号
             }
             return this.map[a]
         });
@@ -165,7 +177,7 @@ class Preprocess {
         });
 
         // console.log( l, 'output', r);
-        return l
+        return { l, replacement: self.replacement };
     }
 
     getComparator(value, restoredValue, comparator) {
