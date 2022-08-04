@@ -50,8 +50,8 @@ class Transformer {
     static etot(expression) {
         const process = new Preprocess(expression);
         const parser = new Parser(process);
-         let a = parser.parse();
-         return a
+        let a = parser.parse();
+        return a
     }
 
     /**

@@ -1,9 +1,20 @@
-const Parser = require("../index");
+const Parser = require('./parser');
+const Preprocess = require('./preprocess');
 
-const validate = (expression) => {
+const validate = (expression, pos) => {
+    pos = pos || expression.length;
+    if (pos > expression.length) {
+        pos = expression.length
+    }
+    if (pos < 0) {
+        pos = 0
+    }
+
     const self = {};
+    const process = new Preprocess(expression);
+    const parser = new Parser(process);
     try {
-        Parser.etot(expression);
+        parser.parse();
         self.result = true;
     }
     catch (e) {
@@ -14,7 +25,16 @@ const validate = (expression) => {
         if (e.data && e.data.key) {
             self.key = e.data.key
         }
-        // console.error(e)
+    }
+
+    const token = parser.search(pos);
+    if (token) {
+        self.token = {
+            from: token.from,
+            to: token.to,
+            type: token.type,
+            value: token.value,
+        }
     }
     return self
 };

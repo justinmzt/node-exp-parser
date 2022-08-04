@@ -168,6 +168,20 @@ class Parser {
         }
         return this._parseExpression()
     }
+
+    search(pos) {
+        if (!this.tokenizer || !this.tokenizer.tokens) {
+            return
+        }
+        for (let i = 0; i < this.tokenizer.tokens.length; i++) {
+            const token = this.tokenizer.tokens[i];
+            if (token && token.from !== undefined && token.to !== undefined) {
+                if (pos >= token.from && pos <= token.to) {
+                    return token
+                }
+            }
+        }
+    }
 }
 
 module.exports = Parser;

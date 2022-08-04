@@ -5,6 +5,11 @@ class Token {
         this.offset = offset;
     }
 
+    setEndOffset(offset) {
+        this.from = this.offset;
+        this.to = offset;
+    }
+
     isKey() {
         return this.type === 'key'
     }
@@ -105,10 +110,12 @@ class Tokenizer {
     next() {
         const token = this.peek();
         this.tokens.push(token);
-        const newExp = this.expression.replace(token.value, '');
 
+        const newExp = this.expression.replace(token.value, '');
         this.offset += this.process.getLength(token.value, token.value.length);
+        token.setEndOffset(this.offset);
         this.expression = newExp;
+
         return token;
     }
 

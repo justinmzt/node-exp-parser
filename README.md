@@ -140,8 +140,9 @@ const result2 = Parser.check({ a: 1, b: 3, c: 4, d: 5 }, 'a: 1 or (b: 2 and (c: 
 
 ### 7. Validation
 
-**Parser.validate(expression)**
+**Parser.validate(expression, pos?)**
 - `expression`: The expression string.
+- `pos`: The cursor position. **Default**: the last of expression.
 - Returns: `Validation`
   - `result`: `<boolean>` 验证结果
   - `errValue`: 错误字符串
@@ -152,11 +153,19 @@ const result2 = Parser.check({ a: 1, b: 3, c: 4, d: 5 }, 'a: 1 or (b: 2 and (c: 
 
 // 通过验证
 const validation = Parser.validate('a:1 and (b: "test")');
-// { "result": true }
+// { "result": true, "token": { "from": 18, "to": 19, "type": "operator", "value": ")" } }
 
 // 括号未闭合
-const validation2 = Parser.validate('a:1 and (b: "test"');
-// { "result": false, "errValue": "test", "errType": "MISSING )", "offset": 18 }
+const validation2_1 = Parser.validate('a:1 and (b: "test"');
+// {
+//     "result": false, "errValue": "", "errType": "MISSING )", "offset": 18,
+//     "token": { "from": 18, "to": 18, "type": "END", "value": "" }
+// }
+const validation2_2 = Parser.validate('a:1 and (b: "test"');
+// {
+//     "result": false, "errValue": "", "errType": "MISSING )", "offset": 36,
+//     "token": { "from": 35, "to": 36, "type": "operator", "value": ")" }
+// }
 
 // 匹配特殊字符
 const validation3 = Parser.validate('a:1 and (b: \\"test');
@@ -176,16 +185,27 @@ const validation5 = Parser.validate('a: [1,2, 3, 4]  and c: "\$" !');
 // 缺少 VALUE，此时会同步输出所在语句的 KEY 值
 const validation6_1 = Parser.validate('a:   and b:1');
 // { "result": false, "errValue": "and", "errType": "VALUE", "offset": 5, "key": "a" }
-const validation6_1 = Parser.validate('a:   not b:1');
+const validation6_2= Parser.validate('a:   not b:1');
 // { "result": false, "errValue": "not", "errType": "VALUE", "offset": 5, "key": "a" }
-const validation6_1 = Parser.validate('a:   ');
-// { "result": false, "errValue": "", "errType": "VALUE", "offset": 5, "key": "a" }
+const validation6_3 = Parser.validate('a:   ');
+// {
+//     "result": false, "errValue": "", "errType": "VALUE", "offset": 5, "key": "a",
+//     "token": { "from": 5, "to": 5, "type": "END", "value": "" }
+// }
 
 // 缺少 KEY
 const validation7_1 = Parser.validate('(');
-// { "result": false, "errValue": "", "errType": "KEY", "offset": 1 }
+// {
+//     "result": false, "errValue": "", "errType": "KEY", "offset": 1,
+//     "token": { "from": 0, "to": 1, "type": "operator", "value": "(" }
+// }
 const validation7_2 = Parser.validate('and b:1');
 // { "result": false, "errValue": "and", "errType": "KEY", "offset": 0 }
+const validation7_3 = Parser.validate('a:1 and not');
+// {
+//     "result": false, "errValue": "", "errType": "KEY", "offset": 11,
+//     "token": { "from": 8, "to": 11, "type": "operator", "value": "not" }
+// }
 
 
 ```

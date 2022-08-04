@@ -95,13 +95,25 @@ const ruleExp = [
         false,
         'KEY',
         1
-    ], // 缺少 KEY
+    ], // 缺少 KEY 1
     [
         'and a:1',
         false,
         'KEY',
         0
-    ], // 缺少 KEY
+    ], // 缺少 KEY 2
+    [
+        'a:1 and not',
+        false,
+        'KEY',
+        11
+    ], // 缺少 KEY 3
+    [
+        'a:1 and (b: "test")',
+        true,
+        '',
+        ''
+    ], // 正常情况，测试 POS
 ];
 
 module.exports = {
