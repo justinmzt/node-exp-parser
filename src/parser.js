@@ -122,23 +122,24 @@ class Parser {
 
     // AndExpression ::= Unary |
     //					 AndExpression 'and' unary|
-    _parseAndExp(left) {
+    _parseAndExp() {
         var token, right;
+        const left = this._parseUnary();
         token = this.tokenizer.peek();
-        if (token.isOr() || token.isAnd()) {
+        if (token.isAnd()) {
             token = this.tokenizer.next();
-            right = this._parseUnary();
+            right = this._parseAndExp();
             if (!right) {
                 throw this.process.error('EXPRESSION', token);
             }
-            return this._parseAndExp({
+            return {
                 type: "binary",
                 content: {
                     operator: token.value,
                     left: left,
                     right: right
                 }
-            })
+            }
         }
         else if (token.isNot()) {
             throw this.process.error('NOT_OPERATOR_ERROR', token);
@@ -150,10 +151,29 @@ class Parser {
         return left;
     }
 
+    _parseOrExp() {
+        const left = this._parseAndExp();
+        let token = this.tokenizer.peek();
+        if (token.isOr()) {
+            token = this.tokenizer.next();
+            const right = this._parseExpression();
+
+            return {
+                type: "binary",
+                content: {
+                    operator: token.value,
+                    left: left,
+                    right: right
+                }
+            }
+        }
+
+        return left;
+    }
+
     // Expression ::= OrExpression
     _parseExpression() {
-        var left = this._parseUnary();
-        var exp = this._parseAndExp(left);
+        const exp = this._parseOrExp();
         if (!exp) throw this.process.error('EXPRESSION', this.tokenizer.last());
 
         return exp

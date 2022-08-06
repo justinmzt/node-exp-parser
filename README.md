@@ -163,7 +163,7 @@ const validation2_1 = Parser.validate('a:1 and (b: "test"');
 //     "result": false, "errValue": "", "errType": "MISSING )", "offset": 18,
 //     "token": { "from": 18, "to": 18, "type": "END", "value": "" }
 // }
-const validation2_2 = Parser.validate('a:1 and (b: "test"');
+const validation2_2 = Parser.validate('a:1 and (b: "test" or (c: 2 and d:3)');
 // {
 //     "result": false, "errValue": "", "errType": "MISSING )", "offset": 36,
 //     "token": { "from": 35, "to": 36, "type": "operator", "value": ")" }

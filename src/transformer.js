@@ -190,14 +190,20 @@ class Transformer {
                 else if (data.content.operator === "or") {
                     symbol = "or"
                 }
-                const rightExp = Transformer.ttoe(data.content.right)
+                let leftExp = Transformer.ttoe(data.content.left);
 
-                if (data.content.right.type === 'binary') {
-                    return `${Transformer.ttoe(data.content.left)} ${symbol} (${rightExp})`;
+                if (data.content.left.type === 'binary' && data.content.left.content.operator !== 'and') {
+                    leftExp = `(${leftExp})`;
                 }
-                else {
-                    return `${Transformer.ttoe(data.content.left)} ${symbol} ${rightExp}`;
+
+                let rightExp = Transformer.ttoe(data.content.right);
+
+                if (data.content.right.type === 'binary' && data.content.right.content.operator !== 'and') {
+                    if (data.content.operator !== 'or') {
+                        rightExp = `(${rightExp})`;
+                    }
                 }
+                return `${leftExp} ${symbol} ${rightExp}`;
             }
             // 一元类型
             case "unary": {

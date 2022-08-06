@@ -13,13 +13,18 @@ const ruleExp = [
     [
         'a: 1 or b: 2 and (c: 3 or d: 4)',
         { a: 1, b: 3, c: 4, d: 5 },
-        false,
+        true,
     ], // 混合使用
     [
         'a: 1 or (b: 2 and (c: 3 or d: 4))',
         { a: 1, b: 3, c: 4, d: 5 },
         true,
     ], // 混合使用二
+    [
+        '(a: 1 or b: 2) and (c: 3 or d: 4)',
+        { a: 1, b: 3, c: 4, d: 5 },
+        false,
+    ], // 混合使用三
     [
         'a:[1,2,3] and b:["test","test2", "test3"]',
         { a: 3, b: "test3" },
