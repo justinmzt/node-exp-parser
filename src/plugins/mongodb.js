@@ -246,8 +246,10 @@ class MongoDBParser {
             return parseInt(value);
         }
         return value
-            .replace(/"/g, '')
-            .replace(/\\([*$])/g, ($, $1) => {
+            .replace(/\\($)/g, ($, $1) => {
+                return $1
+            })
+            .replace(/\\(.)/g, ($, $1) => {
                 return $1
             });
     }

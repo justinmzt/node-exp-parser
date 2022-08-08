@@ -21,8 +21,8 @@ const ruleExp = [
     [
         'a:1 and (b: \\"test',
         false,
-        'EXCEPTION',
-        13,
+        'MISSING )',
+        18,
     ], // 特殊字符
     [
         'a: "t"est 5224"',
@@ -36,12 +36,6 @@ const ruleExp = [
         'OPERATOR',
         2
     ], // 缺少逻辑符号，也可以是缺少运算符号
-    [
-        'a:\\!',
-        false,
-        'NOT_OPERATOR_ERROR',
-        3,
-    ], // 多余的 NOT 符号
     [
         'a:\\ not',
         false,

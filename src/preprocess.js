@@ -27,7 +27,7 @@ class Preprocess {
         this.timeReplacementReg = new RegExp(/(?<!\\)\$_date_\d+/g);
         this.arrayTokenReg = new RegExp(/^(?<!\\)\$_array_\d+$/);
         this.timeTokenReg = new RegExp(/^(?<!\\)\$_date_\d+$/);
-        this.astriskReg = new RegExp(/^(?<!\\)\*$/);
+        this.astriskReg = new RegExp(/(?<!\\)\*/);
 
         // 转化转义后的反斜杠
         this.generateBackslashToken();

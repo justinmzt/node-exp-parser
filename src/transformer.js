@@ -139,7 +139,14 @@ class Transformer {
         if (/^\\0$/.test(value)) {
             return value
         }
-        return `"${value}"`
+        const v = value
+            .replace(/(?<!\\)\\($)/g, ($, $1) => {
+                return $1
+            })
+            .replace(/\\([^\\!@#$%^&*()\-+;':"{}\[\]])/g, ($, $1) => {
+                return $1
+            });
+        return `"${v}"`
     }
 
     static displayComparatorExpression(obj) {
