@@ -1,6 +1,5 @@
 const Parser = require('./parser');
 const Preprocess = require('./preprocess');
-const MongoDBPlugin = require('./plugins/mongodb');
 
 /**
  * @function Branch To Frontend JSON
@@ -54,16 +53,6 @@ class Transformer {
         return a
     }
 
-    /**
-     * @function Expression To MongoDB Query
-     * @param expression
-     * @param option
-     * @param option.keyLang: 表达式 key 的语言，对应 keymap
-     */
-    static etom(expression, option = {}) {
-        const process = new Preprocess(expression);
-        return MongoDBPlugin.exec(process, option)
-    }
 
     /**
      * @function Tree To Frontend JSON

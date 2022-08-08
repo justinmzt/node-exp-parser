@@ -2,6 +2,8 @@
 // BUG => AlertName != "SYSTEM DOWN - SERVER" and AlertName!= "SNMP NOT RESPONDING - SERVER" =>DOUBLE KEY
 
 const Parser = require('../parser');
+const Preprocess = require('../preprocess');
+
 const comparatorController = {
     ['=']: (self, key, value) => {
         self[key] = value;
@@ -252,7 +254,17 @@ class MongoDBParser {
 
 }
 
-function exec(process, option) {
+/**
+ * @function Expression To MongoDB Query
+ * @param expression
+ * @param option
+ * @param option.keyLang: 表达式 key 的语言，对应 keymap
+ */
+function exec(expression, option = {}) {
+    if (typeof expression !== 'string') {
+        return {}
+    }
+    const process = new Preprocess(expression);
     const parser = new Parser(process);
     const exp = parser.parse();
     const dbParser = new MongoDBParser(option);

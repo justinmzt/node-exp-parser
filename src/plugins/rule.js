@@ -239,7 +239,10 @@ class Rule {
 
 }
 
-function exec(target, expression, option) {
+function exec(target, expression, option = {}) {
+    if (typeof expression !== 'string') {
+        return {}
+    }
     const process = new Preprocess(expression);
     const parser = new Parser(process);
     const exp = parser.parse();

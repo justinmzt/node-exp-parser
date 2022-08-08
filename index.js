@@ -1,6 +1,7 @@
 const Parser = require('./src/parser');
 const Transformer = require('./src/transformer');
 const { validate } = require('./src/validation');
+const MongodbController = require('./src/plugins/mongodb');
 const Rule = require('./src/plugins/rule');
 
 exports.Parser = Parser;
@@ -29,7 +30,7 @@ exports.ttoe = Transformer.ttoe;
  * @param option
  * @param option.keyLang: 表达式 key 的语言，对应 keymap
  */
-exports.etom = Transformer.etom;
+exports.etom = MongodbController.exec;
 
 /**
  * @function 语法树转前端 UI 数据
