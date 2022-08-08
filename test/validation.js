@@ -108,6 +108,12 @@ const ruleExp = [
         'KEY',
         11
     ], // 缺少 KEY 3
+    [
+        'a:\\\\"',
+        false,
+        'OPERATOR',
+        4
+    ], // 反斜杠转义测试
 ];
 
 module.exports = {

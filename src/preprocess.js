@@ -177,7 +177,7 @@ class Preprocess {
         });
         // 复原反斜杠
         input = input.replace(this.backslashTokenReg, a => {
-            l -= (this.backslashToken - 4);
+            l -= (this.backslashToken.toString().length - 4);
             return '\\\\\\\\'
         });
         // 复原 $
