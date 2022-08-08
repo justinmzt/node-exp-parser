@@ -169,9 +169,9 @@ const validation2_2 = Parser.validate('a:1 and (b: "test" or (c: 2 and d:3)');
 //     "token": { "from": 35, "to": 36, "type": "operator", "value": ")" }
 // }
 
-// 匹配特殊字符
-const validation3 = Parser.validate('a:1 and (b: \\"test');
-// { "result": false, "errValue": "\"", "errType": "EXCEPTION", "offset": 13 }
+// 不可识别的字符
+const validation3 = Parser.validate('a:1 and (b: !test');
+// { "result": false, "errValue": "!", "errType": "EXCEPTION", "offset": 12 }
 
 // 缺少逻辑符号，也可以是缺少运算符号
 const validation4_1 = Parser.validate('a dun');
@@ -209,6 +209,11 @@ const validation7_3 = Parser.validate('a:1 and not');
 //     "token": { "from": 8, "to": 11, "type": "operator", "value": "not" }
 // }
 
+// 未闭合的引号
+const validation9_1 = Parser.validate('a:1 and (b: "test');
+// { "result": false, "errValue": "\"", "errType": "UNCLOSED_QUOTATION", "offset": 12 }
+const validation9_2 = Parser.validate('a:te"');
+// { "result": false, "errValue": "\"", "errType": "UNCLOSED_QUOTATION", "offset": 4 }
 
 ```
 ```js

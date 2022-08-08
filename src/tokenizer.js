@@ -55,6 +55,10 @@ class Tokenizer {
             content: /^ *((?:\\\\[!@#$%^&*()\-+;':"{}\[\]]|[\u2E80-\uFFFD\w.*\\$])+|"(?:.*?(?<!\\\\))") */
         },
         {
+            type: 'exception"',
+            content: /^ *(?<!\\\\)"/
+        },
+        {
             type: 'exception',
             content: /^ *(?:(?<!\\\\)[!@#$%^&*()\-+;':"{}\[\]]|[^\u2E80-\uFFFD\w.*\\$])+/
         }
@@ -102,6 +106,11 @@ class Tokenizer {
             }
         }
 
+        if (token && token.type === 'exception"') {
+            this.tokens.push(token);
+            this.expression = this.expression.replace(token.value, '');
+            throw this.process.error('UNCLOSED_QUOTATION', this.last())
+        }
         if (token && token.type === 'exception') {
             this.tokens.push(token);
             this.expression = this.expression.replace(token.value, '');

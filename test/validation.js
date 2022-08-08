@@ -13,10 +13,10 @@ const ruleExp = [
         36,
     ], // 多个括号未闭合
     [
-        'b: "test',
+        'a:1 and (b: !test',
         false,
         'EXCEPTION',
-        3,
+        12,
     ], // 特殊字符
     [
         'a:1 and (b: \\"test',
@@ -102,12 +102,20 @@ const ruleExp = [
         'KEY',
         11
     ], // 缺少 KEY 3
+
+    // 未闭合的引号
     [
         'a:\\\\"',
         false,
-        'OPERATOR',
+        'UNCLOSED_QUOTATION',
         4
     ], // 反斜杠转义测试
+    [
+        'a:1 and (b: "test',
+        false,
+        'UNCLOSED_QUOTATION',
+        12,
+    ], // 特殊字符
 ];
 
 module.exports = {
@@ -122,7 +130,8 @@ module.exports = {
             const validation = Parser.validate(self.exp);
             // console.log(JSON.stringify(validation));
             if (validation.result !== self.result ||
-                (validation.result === false && validation.offset !== self.offset)
+                (validation.result === false && validation.offset !== self.offset) ||
+                validation.errType !== self.errType
             ) {
                 console.log(self.exp, '***********Expression Error');
                 errExps.push(self.exp);

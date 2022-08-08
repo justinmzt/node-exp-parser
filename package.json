@@ -1,6 +1,6 @@
 {
   "name": "node-exp-parser",
-  "version": "1.0.30",
+  "version": "1.0.31",
   "description": "node-exp-parser",
   "main": "index.js",
   "directories": {
