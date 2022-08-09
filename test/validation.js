@@ -116,6 +116,19 @@ const ruleExp = [
         'UNCLOSED_QUOTATION',
         12,
     ], // 特殊字符
+    // 数组未闭合
+    [
+        'a:1 and b: [1,2,3',
+        false,
+        'UNCLOSED_ARRAY',
+        11,
+    ],
+    [
+        'a:1 and b: saf]',
+        false,
+        'EXCEPTION',
+        14,
+    ], // 右括号作为特殊字符需要在引号内，或使用转义符
 ];
 
 module.exports = {
@@ -134,6 +147,15 @@ module.exports = {
                 validation.errType !== self.errType
             ) {
                 console.log(self.exp, '***********Expression Error');
+                if (validation.result !== self.result) {
+                    console.error('***********Result Error, Correct Value: ', validation.result);
+                }
+                if (validation.errType !== self.errType) {
+                    console.error('***********Type Error, Correct Value: ', validation.errType);
+                }
+                if (validation.result === false && validation.offset !== self.offset) {
+                    console.error('***********Offset Error, Correct Value: ', validation.offset);
+                }
                 errExps.push(self.exp);
                 console.log('----------------------------------------------');
             }

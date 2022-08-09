@@ -52,15 +52,19 @@ class Tokenizer {
         { type: 'operator', content: /^(not)(?: |$)|^(and)(?: |$)|^(or)(?: |$)|^(&&)(?: |$)|^(\|\|)(?: |$)|^(\() ?|^(\)) ?|^(!)(?: |$)/ },
         {
             type: 'string',
-            content: /^ *((?:\\\\[!@#$%^&*()\-+;':"{}\[\]]|[\u2E80-\uFFFD\w.*\\$])+|"(?:.*?(?<!\\\\))") */
+            content: /^ *((?:\\\\[!@#$%^&*()\-+;':"{}\[\],]|[\u2E80-\uFFFD\w.*\\$])+|"(?:.*?(?<!\\\\))") */
         },
         {
             type: 'exception"',
             content: /^ *(?<!\\\\)"/
         },
         {
+            type: 'exception[]',
+            content: /^ *(?<!\\\\)[\[]/
+        },
+        {
             type: 'exception',
-            content: /^ *(?:(?<!\\\\)[!@#$%^&*()\-+;':"{}\[\]]|[^\u2E80-\uFFFD\w.*\\$])+/
+            content: /^ *(?:(?<!\\\\)[!@#$%^&*()\-+;':"{}\[\],]|[^\u2E80-\uFFFD\w.*\\$])+/
         }
         //'string': /^ *(([a-zA-Z0-9-_\.\*%:\\\/\.]{1,})|([\'\"][a-zA-Z0-9-_\.\*%:\(\)\\\/\. ]{1,}[\'\"])) */
     ];
@@ -110,6 +114,11 @@ class Tokenizer {
             this.tokens.push(token);
             this.expression = this.expression.replace(token.value, '');
             throw this.process.error('UNCLOSED_QUOTATION', this.last())
+        }
+        if (token && token.type === 'exception[]') {
+            this.tokens.push(token);
+            this.expression = this.expression.replace(token.value, '');
+            throw this.process.error('UNCLOSED_ARRAY', this.last())
         }
         if (token && token.type === 'exception') {
             this.tokens.push(token);

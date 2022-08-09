@@ -215,6 +215,12 @@ const validation9_1 = Parser.validate('a:1 and (b: "test');
 const validation9_2 = Parser.validate('a:te"');
 // { "result": false, "errValue": "\"", "errType": "UNCLOSED_QUOTATION", "offset": 4 }
 
+// 未闭合的数组符号
+const validation9_1 = Parser.validate('a:1 and b: [1,2,3');
+// { "result": false, "errValue": "[", "errType": "UNCLOSED_ARRAY", "offset": 11 }
+const validation9_2 = Parser.validate('a:1 and b: saf]');
+// { "result": false, "errValue": "]", "errType": "EXCEPTION", "offset": 14 } // 右括号作为特殊字符需要在引号内，或使用转义符
+
 ```
 ```js
 // 一些查询位置的例子
@@ -289,4 +295,4 @@ const validation8_4 = Parser.validate('a: TIME("2010/10/10*")  and c: "\$" !', 5
 - a:TIME("2011/11/11 15:00:00","2021/11/11 15:00:00")
 
 ### 8. 转义
-使用 "\" 转义 !, @, #, %, ^, &, *, (, ), \, -, +, ;, ', :, ", {, }, [, ] 等字符。
+使用 "\" 转义 !, @, #, %, ^, &, *, (, ), \, -, +, ;, ', :, ", {, }, [, ], "," 等字符。
