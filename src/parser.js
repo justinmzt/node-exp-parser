@@ -32,6 +32,7 @@ class Parser {
         this.tokenizer = this.expression ?
             new Tokenizer(this.process, this.expression) :
             new Tokenizer(this.process, '');
+        this.bracket_depth = 0;
     }
 
     // Condition ::= Key '=' Value |
@@ -87,9 +88,11 @@ class Parser {
         }
         if (token.isOperator() && token.value === '(') {
             this.tokenizer.next();
+            this.bracket_depth++;
             var exp = this._parseExpression();
             token = this.tokenizer.next();
             if (token.isOperator() && token.value === ')') {
+                this.bracket_depth--;
                 return exp
             }
             else {
@@ -143,6 +146,9 @@ class Parser {
         }
         else if (token.isNot()) {
             throw this.process.error('NOT_OPERATOR_ERROR', token);
+        }
+        else if (token.isOperator() && token.value === ')' && !this.bracket_depth) {
+            throw this.process.error('BRACKET_OPERATOR_ERROR', token);
         }
         else if (!token.isEnd() && !token.isOperator()) {
             throw this.process.error('OPERATOR', token);

@@ -129,6 +129,19 @@ const ruleExp = [
         'EXCEPTION',
         14,
     ], // 右括号作为特殊字符需要在引号内，或使用转义符
+    [
+        'a: 1) asdfas',
+        false,
+        'BRACKET_OPERATOR_ERROR',
+        4,
+    ], // 右括号报错，需要转义
+    [
+        'b: 12)',
+        false,
+        'BRACKET_OPERATOR_ERROR',
+        5,
+    ], // 右括号报错
+
 ];
 
 module.exports = {

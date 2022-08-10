@@ -103,20 +103,21 @@ function extend(o1, o2) {
         }
         return ret;
     }
-    for (k in o1) {
+    for (let k of Object.keys(o1)) {
         ret[k] = o1[k];
     }
-    for (k in o2) {
-        if (k in ret) {
+    for (let k of Object.keys(o2)) {
+        if (ret[k] !== undefined) {
             ret['$and'] = [];
-            var a = {};
-            a[k] = o2[k];
-            ret['$and'].push(a);
-            var a = {};
-            a[k] = ret[k];
-            ret['$and'].push(a);
+            ret['$and'].push({
+                [k]: o2[k]
+            });
+            ret['$and'].push({
+                [k]: ret[k]
+            });
             delete ret[k];
-        } else {
+        }
+        else {
             ret[k] = o2[k];
         }
     }

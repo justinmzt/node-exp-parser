@@ -221,6 +221,10 @@ const validation9_1 = Parser.validate('a:1 and b: [1,2,3');
 const validation9_2 = Parser.validate('a:1 and b: saf]');
 // { "result": false, "errValue": "]", "errType": "EXCEPTION", "offset": 14 } // 右括号作为特殊字符需要在引号内，或使用转义符
 
+// 错误的右 括号
+const validation10_1 = Parser.validate('a: 1) asdfas');
+// { "result": false, "errValue": ")", "errType": "BRACKET_OPERATOR_ERROR", "offset": 4 }
+
 ```
 ```js
 // 一些查询位置的例子
