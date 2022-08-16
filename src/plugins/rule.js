@@ -2,6 +2,7 @@
 
 const Parser = require('../parser');
 const Preprocess = require('../preprocess');
+const { validate } = require('../validation');
 
 const comparatorController = {
     ['=']: (target, key, value) => {
@@ -243,7 +244,11 @@ class Rule {
 
 function exec(target, expression, option = {}) {
     if (typeof expression !== 'string') {
-        return {}
+        return false
+    }
+    const validation = validate(expression);
+    if (!validation.result) {
+        return false
     }
     const process = new Preprocess(expression);
     const parser = new Parser(process);

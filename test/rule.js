@@ -50,6 +50,16 @@ const ruleExp = [
         { a: "2009-11-30T06:06:24.192Z" },
         true,
     ], // 时间匹配，小于
+    [
+        'a:1 and',
+        { a: 1 },
+        false,
+    ], // 报错
+    [
+        {},
+        { a: 1 },
+        false,
+    ], // 输入错误信息
 ];
 
 module.exports = {
