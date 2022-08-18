@@ -243,8 +243,8 @@ class MongoDBParser {
                 return this._handleValue(item)
             })
         }
-        if (value.match(/^[-]{0,1}\d*$/)) {
-            return parseInt(value);
+        if (value.match(/^-?\d+(?:\.\d*)?$/)) {
+            return parseFloat(value);
         }
         return value
             .replace(/\\($)/g, ($, $1) => {

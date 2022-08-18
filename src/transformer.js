@@ -133,8 +133,8 @@ class Transformer {
         if (!value) {
             return `""`
         }
-        if (/^\d+$/.test(value)) {
-            return parseInt(value)
+        if (/^-?\d+(?:\.\d*)?$/.test(value)) {
+            return parseFloat(value)
         }
         if (/^\\0$/.test(value)) {
             return value
