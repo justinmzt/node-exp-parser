@@ -4,6 +4,8 @@ const Parser = require('../parser');
 const Preprocess = require('../preprocess');
 const { validate } = require('../validation');
 
+const REG = require('../reg');
+
 const comparatorController = {
     ['=']: (target, key, value) => {
         if (target[key] === undefined || value === undefined) {
@@ -18,7 +20,7 @@ const comparatorController = {
         if (!target[key] || !target[key] instanceof String) {
             return false
         }
-        const regString = value.replace(/\\\*/g, '..').replace(/[^\u4E00-\u9FA5\w\-_*]/g, '.').replace(/(?<!\\)\*/g, '.*?');
+        const regString = value.replace(REG.ESCAPED_ASTERISK, '..').replace(REG.ESCAPE_WORD, '.').replace(REG.LIKE, '.*?');
         const reg = new RegExp(regString, 'i');
         return reg.test(target[key]);
     },
@@ -114,15 +116,15 @@ const comparatorController = {
 // 解析日期字符串
 function _parseDateValue(value = '') {
     const self = {};
-    if (/\d\d\d\d\/\d\d\/\d\d \d\d:\d\d:\d\d/.test(value)) {
+    if (REG.DATE.test(value)) {
         return { result: new Date(value) }
     }
-    self.match = value.match(/^((?:19|20)\d\d)\*$/);
+    self.match = value.match(REG.DATE_YEAR);
     if (self.match) {
         const year = parseInt(self.match[1]);
         return { $gte: new Date(`${year}/01/01`), $lt: new Date(`${year + 1 }/01/01`) }
     }
-    self.match = value.match(/^((?:19|20)\d\d\/[01]\d)\*$/);
+    self.match = value.match(REG.DATE_MONTH);
     if (self.match) {
         const month = self.match[1];
         const begin = new Date(`${month}/01`);
@@ -130,7 +132,7 @@ function _parseDateValue(value = '') {
         end.setMonth(begin.getMonth() + 1);
         return { $gte: begin, $lt: end }
     }
-    self.match = value.match(/^((?:19|20)\d\d\/[01]\d\/[0-3]\d)\*$/);
+    self.match = value.match(REG.DATE_DAY);
     if (self.match) {
         const date = self.match[1];
         const begin = new Date(`${date}`);
@@ -228,14 +230,14 @@ class Rule {
                 return this._handleValue(item)
             })
         }
-        if (value.match(/^[-]{0,1}\d*$/)) {
-            return parseInt(value);
+        if (value.match(REG.NUMBER)) {
+            return parseFloat(value);
         }
         return value
-            .replace(/\\($)/g, ($, $1) => {
+            .replace(REG.ESCAPED_DOLLAR, ($, $1) => {
                 return $1
             })
-            .replace(/\\(.)/g, ($, $1) => {
+            .replace(REG.ESCAPED_DOT, ($, $1) => {
                 return $1
             });
     }

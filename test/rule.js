@@ -11,6 +11,11 @@ const ruleExp = [
         true,
     ], // 普通测试二
     [
+        'a:1.2 and b:000.1000',
+        { a: 1.2, b: 0.1 },
+        true,
+    ], // 小数点
+    [
         'a: 1 or b: 2 and (c: 3 or d: 4)',
         { a: 1, b: 3, c: 4, d: 5 },
         true,

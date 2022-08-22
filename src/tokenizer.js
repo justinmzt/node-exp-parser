@@ -1,3 +1,5 @@
+const REG = require('./reg');
+
 class Token {
     constructor(type, value, offset) {
         this.type = type;
@@ -48,23 +50,29 @@ class Tokenizer {
     static reg = [
         // 'key': /^ *([a-zA-Z0-9-]{1,}) *(=|>=|<=|>|<|!=)/,
         //'key': /^ *([a-zA-Z0-9-]{1,}) */,
-        { type: 'comparator', content: /^ *(?::|>=|<=|>|<) */ },
-        { type: 'operator', content: /^(not)(?: |$)|^(and)(?: |$)|^(or)(?: |$)|^(&&)(?: |$)|^(\|\|)(?: |$)|^(\() ?|^(\)) ?|^(!)(?: |$)/ },
+        {
+            type: 'comparator',
+            content: new RegExp('^ *(?::|>=|<=|>|<) *')
+        },
+        {
+            type: 'operator',
+            content: new RegExp('^(not)(?: |$)|^(and)(?: |$)|^(or)(?: |$)|^(&&)(?: |$)|^(\\|\\|)(?: |$)|^(\\() ?|^(\\)) ?|^(!)(?: |$)')
+        },
         {
             type: 'string',
-            content: /^ *((?:\\\\[!@#$%^&*()+;':"{}\[\],]|[\u2E80-\uFFFD\w\-.*\\$])+|"(?:.*?(?<!\\\\))") */
+            content: new RegExp('^ *((?:\\\\\\\\[!@#$%^&*()+;\':"{}\\[\\],]|[\u2E80-\uFFFD\\w\\-.*\\\\$])+|"(?:.*?(?<!\\\\\\\\))") *')
         },
         {
             type: 'exception"',
-            content: /^ *(?<!\\\\)"/
+            content: new RegExp('^ *(?<!\\\\\\\\)"')
         },
         {
             type: 'exception[]',
-            content: /^ *(?<!\\\\)[\[]/
+            content: new RegExp('^ *(?<!\\\\\\\\)[\\[]')
         },
         {
             type: 'exception',
-            content: /^ *(?:(?<!\\\\)[!@#$%^&*()+;':"{}\[\],]|[^\u2E80-\uFFFD\w\-.*\\$])+/
+            content: new RegExp('^ *(?:(?<!\\\\\\\\)[!@#$%^&*()+;\':"{}\\[\\],]|[^\u2E80-\uFFFD\\w\\-.*\\\\$])+')
         }
         //'string': /^ *(([a-zA-Z0-9-_\.\*%:\\\/\.]{1,})|([\'\"][a-zA-Z0-9-_\.\*%:\(\)\\\/\. ]{1,}[\'\"])) */
     ];
@@ -79,7 +87,7 @@ class Tokenizer {
 
     trimStart() {
         if (this.expression && this.expression.length) {
-            const newExp = this.expression.replace(/^\s+/, '');
+            const newExp = this.expression.replace(REG.TRIM_START, '');
             this.offset += (this.expression.length - newExp.length);
             if (this.replacement) {
                 this.offset -= 1;

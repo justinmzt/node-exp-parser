@@ -3,14 +3,15 @@
 const Exception = require("./exception");
 
 const COMPARATOR_SET = new Set(['>', '<', '>=', '<=']);
+const REG = require('./reg');
 
 class Preprocess {
     constructor(exp) {
         // 空白符均变为空格
-        this.origin = exp.replace(/\s/g, ' ');
+        this.origin = exp.replace(REG.SPACE, ' ');
 
         // 转化 \\, $ 符号为 "\\\\" "\\$"
-        this.exp = this.origin.replace(/[\\$]/g, (a) => {
+        this.exp = this.origin.replace(REG.PROPRECESS_ESCAPE, (a) => {
             return "\\" + a
         });
         this.map = {};
@@ -114,7 +115,7 @@ class Preprocess {
         // 复原反斜杠
         input = input.replace(this.backslashTokenReg, '\\\\\\\\');
         // 复原 $
-        input = input.replace(/\\([\\$])/g, (a, b) => {
+        input = input.replace(REG.RESTORE, (a, b) => {
             return b
         });
 
@@ -181,7 +182,7 @@ class Preprocess {
             return '\\\\\\\\'
         });
         // 复原 $
-        input = input.replace(/\\([\\$])/g, (a, b) => {
+        input = input.replace(REG.RESTORE, (a, b) => {
             l -= 1;
             return b
         });

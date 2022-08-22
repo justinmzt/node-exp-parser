@@ -1,5 +1,6 @@
 const Parser = require('./parser');
 const Preprocess = require('./preprocess');
+const REG = require('./reg');
 
 /**
  * @function Branch To Frontend JSON
@@ -133,17 +134,17 @@ class Transformer {
         if (!value) {
             return `""`
         }
-        if (/^-?\d+(?:\.\d*)?$/.test(value)) {
+        if (REG.NUMBER.test(value)) {
             return parseFloat(value)
         }
-        if (/^\\0$/.test(value)) {
+        if (REG.EMPTY.test(value)) {
             return value
         }
         const v = value
-            .replace(/(?<!\\)\\($)/g, ($, $1) => {
+            .replace(REG.TO_EXP_ESCAPED_DOLLAR, ($, $1) => {
                 return $1
             })
-            .replace(/\\([^\\!@#$%^&*()+;':"{}\[\],])/g, ($, $1) => {
+            .replace(REG.TO_EXP_ESCAPED_SP, ($, $1) => {
                 return $1
             });
         return `"${v}"`
@@ -153,7 +154,7 @@ class Transformer {
         let { key, value } = obj;
         const comparator = Transformer.COMPARATOR_MAP[obj.comparator] ?
             ` ${Transformer.COMPARATOR_MAP[obj.comparator]}` : ':';
-        if (/[\\\/:\[\]()"']/.test(key)) {
+        if (REG.TO_EXP_DISPLAY_KEY.test(key)) {
             key = `"${key}"`
         }
         if (obj.comparator === 'exists') {
