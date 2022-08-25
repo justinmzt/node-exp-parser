@@ -1,6 +1,8 @@
 const data = require('./data');
 const Parser = require('../index');
 
+const { dictTest } = require('./dict');
+
 const test = (list, option) => {
     const errExps = [];
     for (let i = 0; i < list.length; i++) {
@@ -9,25 +11,27 @@ const test = (list, option) => {
             self.exp = list[i][0];
             self.expectValue = list[i][1];
             self.mongoQuery = list[i][2];
+            self.dict = list[i][3];
         }
         else {
             self.exp = list[i]
         }
 
-        const mongoDBOpts = Object.assign({}, option);
+        self.opts = Object.assign({}, option);
         // console.log(self.exp, '***********Expression');
         // console.log(JSON.stringify(Parser.etot(self.exp)), "***********Syntax Tree");
-        // console.log(JSON.stringify(Parser.etom(self.exp, mongoDBOpts)), "***********MongoDB Query");
+        // console.log(JSON.stringify(Parser.etom(self.exp, opts)), "***********MongoDB Query");
         // console.log(JSON.stringify(Parser.ttof(Parser.etot(self.exp))), "***********Frontend UI JSON");
         // console.log(JSON.stringify(Parser.ftot(Parser.ttof(Parser.etot(self.exp)))));
         // console.log('----------------------------------------------');
         const result = Parser.ttoe(Parser.etot(self.exp));
         const UIJSONResult = Parser.ttoe(Parser.ftot(Parser.ttof(Parser.etot(self.exp))));
-        const mongoResult = JSON.stringify(Parser.etom(self.exp, mongoDBOpts));
-        if (result !== self.expectValue || UIJSONResult !== self.expectValue || mongoResult !== self.mongoQuery) {
+        const mongoResult = JSON.stringify(Parser.etom(self.exp, self.opts));
+        const dictResult = dictTest(self);
+        if (result !== self.expectValue || UIJSONResult !== self.expectValue || mongoResult !== self.mongoQuery || !dictResult) {
             console.log(self.exp, '***********Expression');
             console.log(JSON.stringify(Parser.etot(self.exp)), "***********Syntax Tree");
-            console.log(JSON.stringify(Parser.etom(self.exp, mongoDBOpts)), "***********MongoDB Query");
+            console.log(JSON.stringify(Parser.etom(self.exp, self.opts)), "***********MongoDB Query");
             console.log(JSON.stringify(Parser.ttof(Parser.etot(self.exp))), "***********Frontend UI JSON");
             if (result !== self.expectValue) {
                 console.error(result, '***********Result, Transform Error');

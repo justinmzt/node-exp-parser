@@ -3,6 +3,7 @@ const Transformer = require('./src/transformer');
 const { validate } = require('./src/validation');
 const MongodbController = require('./src/plugins/mongodb');
 const Rule = require('./src/plugins/rule');
+const Dict = require('./src/plugins/dict');
 
 exports.Parser = Parser;
 
@@ -58,3 +59,9 @@ exports.check = Rule.exec;
  * @param expression
  */
 exports.validate = validate;
+
+/**
+ * @function 获取参数列表
+ * @param expression
+ */
+exports.getDict = Dict.exec;
